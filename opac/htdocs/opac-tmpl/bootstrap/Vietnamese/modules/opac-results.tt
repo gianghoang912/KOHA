@@ -1,0 +1,884 @@
+[% USE Koha %] [% SET TagsShowEnabled = ( ( Koha.Preference( 'TagsEnabled' ) == 1 ) && TagsShowOnList ) %] [% SET TagsInputEnabled = ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'TagsEnabled' ) == 1 ) && TagsInputOnList ) %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  &rsaquo; [% IF ( searchdesc ) %] Kết quả tìm kiếm của [% IF ( query_desc ) %] '[% query_desc | html%]'[% END %][% IF ( limit_desc ) %]&nbsp;với giới hạn:&nbsp;'[% limit_desc | html %]'[% END %] [% ELSE %] Bạn không xác định tiêu chí tìm kiếm. [% END %] [% INCLUDE 'doc-head-close.inc' %] [% IF ( OpacStarRatings == 'all' || Koha.Preference('Babeltheque') ) %] [% BLOCK cssinclude %] <link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/css/jquery.rating.css" />
+ [% END %]
+[% END %]
+
+<link title="Tìm kiếm RSS Feed [% LibraryName |html %] " rel="alternate" type="application/rss+xml" href="[% OPACBaseURL %]/cgi-bin/koha/opac-search.pl?[% query_cgi |uri %][% limit_cgi |uri %]&count=[% countrss |uri %]&sort_by=acqdate_dsc&format=rss2" />
+</head>
+
+[% INCLUDE 'bodytag.inc' bodyid='results' bodyclass='scrollto' %]
+[% INCLUDE 'masthead.inc' %]
+
+ <div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a> <span class="divider">&rsaquo;</span></li>
+ <li>
+ [% IF ( searchdesc ) %]
+ <a href="#">Kết quả tìm kiếm [% IF ( query_desc ) %]của '[% query_desc | html%]'[% END %][% IF ( limit_desc ) %]&nbsp;với giới hạn:&nbsp;'[% limit_desc | html %]'[% END %]</a>
+ [% ELSE %]
+ <a href="#">Bạn không xác định tiêu chí tìm kiếm</a>
+ [% END %]
+ </li>
+ </ul>
+
+ [% UNLESS ( total ) %]
+ <div class="container-fluid maincontent">
+ <div class="row-fluid">
+ <div class="span12">
+ <strong>Không tìm thấy kết quả phù hợp với tìm kiếm của bạn!</strong>
+ <p>
+ [% IF ( searchdesc ) %] Không tìm thấy kết quả phù hợp với tìm kiếm của bạn trong thư viện [% LibraryName %] . <a href="[% OPACBaseURL %]/cgi-bin/koha/opac-search.pl?[% query_cgi | html | url %][% limit_cgi | html | url %]&amp;format=rss2" class="rsssearchlink"><img title="Theo dõi kết quả tìm kiếm này" alt="Theo dõi kết quả tìm kiếm này" class="rsssearchicon" src="[% interface %]/[% theme %]/images/feed-icon-16x16.png" border="0" /></a>
+ [% ELSE %] Bạn không xác định tiêu chí tìm kiếm. [% END %] </p>
+ [% IF ( OPACNoResultsFound ) %]
+ <div id="noresultsfound">
+ [% OPACNoResultsFound %]
+ </div>
+ [% END %]
+ </div> <!-- / .span12 -->
+ </div> <!-- / .row-fluid -->
+ </div> <!-- / .container-fluid -->
+ [% END # / UNLESS searchdesc %]
+
+ <div id="maincontent" class="container-fluid">
+ <div class="row-fluid">
+ [% IF ( opacfacets && total ) %]
+ <div class="span2">
+ <div id="facetcontainer">
+ <!-- FACETS START -->
+ [% INCLUDE 'opac-facets.inc' %]
+ <!-- FACETS END -->
+ </div>
+ </div>
+ [% END %]
+
+ [% IF ( opacfacets && total ) %]<div class="span10 maincontent">[% ELSE %]<div class="span12 maincontent">[% END %]
+
+ [% IF ( searchdesc ) %]
+ <p id="numresults">
+ [% IF ( total ) %]<strong>Tìm thấy [% total |html %] kết quả phù hợp với yêu cầu của bạn.</strong>
+ [% IF ( related ) %]
+ (Tìm kiếm liên quan:
+ [% FOREACH relate IN related %]
+ [% relate.related_search %]
+ [% END %]
+ ).
+ [% END %]
+ <a href="[% OPACBaseURL %]/cgi-bin/koha/opac-search.pl?[% query_cgi |html |url %][% limit_cgi |html | url %]&amp;count=[% countrss |html %]&amp;sort_by=acqdate_dsc&amp;format=rss2" class="rsssearchlink"><img alt="Theo dõi kết quả tìm kiếm này" title="Theo dõi kết quả tìm kiếm này" class="rsssearchicon" src="[% interface %]/[% theme %]/images/feed-icon-16x16.png" /></a>
+ [% END # / IF total %]
+ </p>
+ [% END # / IF searchdesc %]
+
+ <div id="userresults">
+ [% IF ( DidYouMean ) %]
+ <div id="didyoumean">Bạn không tìm thấy tài liệu mình cần? Vui lòng gửi <a href="/cgi-bin/koha/svc/suggestion?render=standalone&amp;q=[% querystring |uri %]">đề xuất mua cho thư viện</a></div>
+ [% END %]
+
+ <div id="top-pages">[% INCLUDE 'page-numbers.inc' %]</div>
+
+ [% IF ( koha_spsuggest ) %] Bạn muốn tìm: <ul style="list-style: none;">
+ [% FOREACH SPELL_SUGGES IN SPELL_SUGGEST %]
+ <li>
+ <a href="/cgi-bin/koha/opac-search.pl?q=[% SPELL_SUGGES.spsuggestion %]">[% SPELL_SUGGES.spsuggestion %]</a>
+ </li>
+ [% END %]
+ </ul>
+ [% END # / IF koha_spsuggest%]
+
+ [% IF ( query_error ) %]
+ <div class="dialog alert">
+ <h4>Lỗi:</h4>
+ [% query_error %]
+ </div>
+ [% END %]
+
+ <!-- Search Results Table -->
+ [% IF ( total ) %]
+
+ <div class="searchresults">
+ <form action="/cgi-bin/koha/opac-search.pl" method="get" name="bookbag_form" id="bookbag_form" class="checkboxed">
+ [% IF ( searchdesc ) %]
+ [% FOREACH QUERY_INPUT IN QUERY_INPUTS %]
+ <input type="hidden" name="[% QUERY_INPUT.input_name |html %]" value="[% QUERY_INPUT.input_value |html %]"/>
+ [% END %]
+ [% FOREACH LIMIT_INPUT IN LIMIT_INPUTS %]
+ <input type="hidden" name="[% LIMIT_INPUT.input_name |html %]" value="[% LIMIT_INPUT.input_value |html %]"/>
+ [% END %]
+ [% END # IF /searchdesc %]
+
+ <div id="toolbar" class="toolbar clearfix">
+ [% IF ( OpacHighlightedWords ) %]
+ <div class="highlight_controls">
+ <a href="#" class="highlight_toggle" id="highlight_toggle_off">Không đánh dấu</a>
+ <a href="#" class="highlight_toggle" id="highlight_toggle_on">Đánh dấu</a>
+ </div>
+ [% END %]
+ <div class="sort_by pull-right">
+ <select id="sort_by" class="resort" name="sort_by"> [% INCLUDE 'resort_form.inc' %] </select>
+ <input id="sortsubmit" type="submit" class="btn btn-small clearfix" value="Sắp xếp" />
+ </div>
+ </div> <!-- / #toolbar -->
+
+ <div id="selections-toolbar" class="toolbar">
+ <!-- checkall, clearall are now needed for placehold -->
+ <span class="checkall"></span>
+ <span class="clearall"></span> <span class="sep">|</span>
+
+ <span class="links">
+ [% IF ( ( Koha.Preference( 'opacbookbag' ) == 1 ) || ( Koha.Preference( 'virtualshelves' ) == 1 ) ) %]
+ <span class="addto"></span>
+ [% END %]
+ <span id="placehold"><!-- input class="submit" type="submit" value="Place Hold"/ --></span>
+
+ [% IF ( TagsInputEnabled && loggedinusername ) %]
+ <span id="tagsel_span">
+ <input class="disabled" type="submit" id="tagsel_tag" value="Tạo từ khóa" />
+ </span>
+ <div id="tagsel_form" style="display:none">
+ <label for="tagsel_new">Tạo từ khóa mới:</label>
+ <input name="tagsel_new" id="tagsel_new" maxlength="100" />
+ <input value="Thêm vào" name="tagsel_button" class="tagsel_button btn btn-small" type="submit" id="tagsel_button" title="Tạo" />
+ <a href="#" id="tagsel_cancel">(Hoàn thành)</a>
+ </div>
+ <div id="tagsel_status" class="tagsel_tatus" style="display:none;">
+ Trạng thái từ khóa. </div>
+ [% END %]
+ </span> <!-- / .links -->
+ </div> <!-- / #selections-toolbar -->
+
+ <!-- TABLE RESULTS START -->
+ <table class="table table-striped">
+
+ <!-- Actual Search Results -->
+ [% FOREACH SEARCH_RESULT IN SEARCH_RESULTS %]
+ <tr>
+ [% # Cell 1: Checkbox %]
+ <td class="select selectcol">
+ [% IF Koha.Preference( 'opacbookbag' ) == 1 %]
+ <input type="checkbox" class="cb" id="bib[% SEARCH_RESULT.biblionumber %]" name="biblionumber" value="[% SEARCH_RESULT.biblionumber %]" /> <label for="bib[% SEARCH_RESULT.biblionumber %]"></label>
+ [% ELSE %]
+ [% IF Koha.Preference( 'virtualshelves' ) == 1 %]
+ <input type="checkbox" class="cb" id="bib[% SEARCH_RESULT.biblionumber %]" name="biblionumber" value="[% SEARCH_RESULT.biblionumber %]" /> <label for="bib[% SEARCH_RESULT.biblionumber %]"></label>
+ [% ELSE %]
+ [% IF Koha.Preference( 'RequestOnOpac' ) == 1 %]
+ [% UNLESS ( SEARCH_RESULT.norequests ) %]
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]<input type="checkbox" class="cb" id="bib[% SEARCH_RESULT.biblionumber %]" name="biblionumber" value="[% SEARCH_RESULT.biblionumber %]" /> <label for="bib[% SEARCH_RESULT.biblionumber %]"></label>
+ [% END %]
+ [% END %]
+ [% END # IF RequestOnOpac %]
+ [% END # IF virtualshelves %]
+ [% END # IF opacbookbag%]
+ </td>
+ [% # Cell 2: Show result number if OpacHiddenItems is empty %]
+ <td class="select selectcol">
+ [% UNLESS suppress_result_number %]
+ [% SEARCH_RESULT.result_number %].
+ [% END %]
+ </td>
+
+ [% IF ( !item_level_itypes && !noItemTypeImages ) %]
+ [% # Cell 3: Show item type image %]
+ <td class="itypecol">
+ [% IF ( SEARCH_RESULT.imageurl ) %]
+ <img src="[% SEARCH_RESULT.imageurl %]" title="[% SEARCH_RESULT.description %]" alt="[% SEARCH_RESULT.description %]" />
+ [% END %]
+ [% IF ( SEARCH_RESULT.score_avg ) %]
+ <img style="max-height: 35px;" src="[% themelang %]/../images/bonus.png" title="giải thưởng" />
+ [% END %]
+ </td>
+ [% END %]
+
+ [% IF ( AuthorisedValueImages ) %]
+ [% # Cell 4: Show Authorized value image %]
+ <td class="authvalcol">
+ [% FOREACH authorised_value_image IN SEARCH_RESULT.authorised_value_images %]
+ [% IF ( authorised_value_image.imageurl ) %]
+ <img src="[% authorised_value_image.imageurl %]" alt="[% authorised_value_image.label %]" title="[% authorised_value_image.label %]">
+ [% END %]
+ [% END %]
+ </td>
+ [% END %]
+
+ [% # Cell 5: Search result details and controls %]
+ <td class="bibliocol">
+ <div class="coverimages">
+ <a class="p1" href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]">
+ [% IF ( OPACLocalCoverImages ) %]
+ <span title="[% SEARCH_RESULT.biblionumber |url %]" class="[% SEARCH_RESULT.biblionumber %]" id="local-thumbnail[% loop.count %]"></span>
+ [% END %]
+ [% IF ( OPACAmazonCoverImages ) %]
+ [% IF ( SEARCH_RESULT.normalized_isbn ) %]
+ [% IF ( using_https ) %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="amazon-thumbnail[% loop.count %]"><img src="https://images-na.ssl-images-amazon.com/images/P/[% SEARCH_RESULT.normalized_isbn %].01.TZZZZZZZ.jpg" alt="" class="item-thumbnail" /></span>
+ [% ELSE %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="amazon-thumbnail[% loop.count %]"><img src="http://images.amazon.com/images/P/[% SEARCH_RESULT.normalized_isbn %].01.TZZZZZZZ.jpg" alt="" class="item-thumbnail" /></span>
+ [% END %]
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF ( SyndeticsEnabled && SyndeticsCoverImages ) %]
+ [% IF SEARCH_RESULT.normalized_isbn %]
+ [% IF ( using_https ) %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="syndetics-thumbnail[% loop.count %]"><img src="https://secure.syndetics.com/index.aspx?isbn=[% SEARCH_RESULT.normalized_isbn %]/SC.GIF&amp;client=[% SyndeticsClientCode %]&amp;type=xw10&amp;upc=[% SEARCH_RESULT.normalized_upc %]&amp;oclc=[% SEARCH_RESULT.normalized_oclc %]" alt="" class="item-thumbnail" /></span>
+ [% ELSE %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="syndetics-thumbnail[% loop.count %]"><img src="http://www.syndetics.com/index.aspx?isbn=[% SEARCH_RESULT.normalized_isbn %]/SC.GIF&amp;client=[% SyndeticsClientCode %]&amp;type=xw10&amp;upc=[% SEARCH_RESULT.normalized_upc %]&amp;oclc=[% SEARCH_RESULT.normalized_oclc %]" alt="" class="item-thumbnail" /></span>
+ [% END %]
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF ( GoogleJackets ) %]
+ [% IF ( SEARCH_RESULT.normalized_isbn ) %]
+ <span style="block" title="[% SEARCH_RESULT.biblionumber |url %]" class="[% SEARCH_RESULT.normalized_isbn %]" id="gbs-thumbnail[% loop.count %]"></span>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF OpenLibraryCovers %]
+ [% IF SEARCH_RESULT.normalized_isbn %]
+ <span style="block" title="[% SEARCH_RESULT.biblionumber %]" class="[% SEARCH_RESULT.normalized_isbn %]" id="openlibrary-thumbnail[% loop.count %]"></span>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+ </a>
+
+ [% IF ( BakerTaylorEnabled ) %]
+ [% IF ( SEARCH_RESULT.normalized_isbn ) %]
+ <a href="https://[% BakerTaylorBookstoreURL |html %][% SEARCH_RESULT.normalized_isbn %]"><img alt="Xem thêm tại Baker & Taylor" src="[% BakerTaylorImageURL |html %][% SEARCH_RESULT.normalized_isbn %]" /></a>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF ( IDreamBooksResults && SEARCH_RESULT.normalized_isbn ) %]
+ <div class="idbresult" style="display: none;">
+ [% IF ( IDreamBooksReviews ) %]
+ <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]#idb_critic_reviews">
+ [% ELSE %]
+ <a href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]">
+ [% END %]
+ [% SEARCH_RESULT.normalized_isbn %]</a>
+ </div>
+ [% END %]
+ </div>
+ [% IF ( COinSinOPACResults && SEARCH_RESULT.coins ) %]
+ <!-- COinS / Openurl -->
+ <span class="Z3988" title="[% SEARCH_RESULT.coins %]"></span>
+ [% END %]
+
+ [% IF ( OPACXSLTResultsDisplay ) %]
+ [% SEARCH_RESULT.XSLTResultsRecord %]
+ [% ELSE %]
+ [% IF ( BiblioDefaultViewmarc ) %]
+ <a title="Xem chi tiết nhan đề này" class="title" href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=[% SEARCH_RESULT.biblionumber |url %]">
+ [% ELSE %]
+ [% IF ( BiblioDefaultViewisbd ) %]
+ <a title="Xem chi tiết nhan đề này" class="title" href="/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=[% SEARCH_RESULT.biblionumber |url %]">
+ [% ELSE %]
+ <a class="title" title="Xem chi tiết nhan đề này" href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% SEARCH_RESULT.biblionumber |url %]">
+ [% END %] [% END %] [% IF ( SEARCH_RESULT.title ) %] [% SEARCH_RESULT.title |html %] [% ELSE %] Tài liệu không có nhan đề [% END %] [% FOREACH subtitl IN SEARCH_RESULT.subtitle %] , [% subtitl.subfield|html %] [% END %]</a>
+
+ [% IF ( SEARCH_RESULT.author ) %] Tác giả: <a title="Tìm kiếm theo tác giả" class="author" href="/cgi-bin/koha/opac-search.pl?q=au:[% SEARCH_RESULT.author |url %]">[% SEARCH_RESULT.author %]</a>
+ [% ELSE %]
+ &nbsp;
+ [% END %]
+
+ <span class="results_summary publisher">
+ <span class="label">Xuất bản:</span>
+ [% IF ( SEARCH_RESULT.place ) %][% SEARCH_RESULT.place %] [% END %]
+ [% IF ( SEARCH_RESULT.publishercode ) %][% SEARCH_RESULT.publishercode|html %][% END %]
+ [% IF ( SEARCH_RESULT.publicationyear ) %]
+ [% SEARCH_RESULT.publicationyear %]
+ [% ELSE %]
+ [% IF ( SEARCH_RESULT.copyrightdate ) %]
+ [% SEARCH_RESULT.copyrightdate %]
+ [% END %]
+ [% END %]
+ [% IF ( SEARCH_RESULT.pages ) %]. [% SEARCH_RESULT.pages %][% END %]
+ [% IF ( SEARCH_RESULT.notes ) %], [% SEARCH_RESULT.notes|html %][% END %]
+ [% IF ( SEARCH_RESULT.size ) %] [% SEARCH_RESULT.size %][% END %]
+ [% IF ( SEARCH_RESULT.timestamp ) %] <i>(Ngày cập nhật: [% SEARCH_RESULT.timestamp %])</i>[% END %]
+ </span>
+
+ [% IF ( SEARCH_RESULT.summary ) %]
+ <span class="result_summary">
+ [% SEARCH_RESULT.summary %]
+ </span>
+ [% END %]
+
+ [% IF ( SEARCH_RESULT.copyrightdate ) %]
+ <span class="results_summary date">
+ <span class="label">Ngày xuất bản:</span>
+ [% SEARCH_RESULT.copyrightdate %]
+ </span>
+ [% END %]
+
+ <span class="results_summary">
+ <span class="label">Sẵn sàng:</span>
+ [% IF ( SEARCH_RESULT.available_items_loop.size() ) %]
+ <span class="available"><strong>Tài liệu sẵn sàng:</strong>
+ [% FOREACH available_items_loo IN SEARCH_RESULT.available_items_loop %]
+ [% IF available_items_loo.this_branch %]
+ <span class="highlight-row-results">
+ [% ELSE %]
+ <span>
+ [% END %]
+
+ [% IF ( singleBranchMode ) %]
+ [% available_items_loo.location %]
+ [% ELSE %]
+ [% available_items_loo.branchname %]
+ [% END %]
+
+ [% IF ( OPACItemsResultsDisplay ) %]
+ [% UNLESS ( singleBranchMode ) %][% available_items_loo.location %][% END %]
+ [% IF ( available_items_loo.itemcallnumber ) %][<a href="/cgi-bin/koha/opac-search.pl?q=callnum:[% available_items_loo.itemcallnumber |url %]">[% available_items_loo.itemcallnumber %]</a>][% END %]
+ [% END %]
+ ([% available_items_loo.count %]),
+ </span>
+ [% END # / FOREACH available_items_loo %]
+ </span>
+ [% ELSE %]
+ [% IF ( SEARCH_RESULT.ALTERNATEHOLDINGS ) %]
+ [% FOREACH ALTERNATEHOLDING IN SEARCH_RESULT.ALTERNATEHOLDINGS %]
+ &nbsp;<span id="alternateholdings">[% ALTERNATEHOLDING.holding %]</span>,
+ [% END %]
+ [% ELSE %]
+ <span class="unavailable">Tài liệu không sẵn sàng:</span>
+ [% END %]
+ [% END # / IF SEARCH_RESULT.available_items_loop.size %]
+
+ <span class="unavailable">
+ [% IF ( SEARCH_RESULT.onloancount ) %] Được ghi mượn ([% SEARCH_RESULT.onloancount %]), [% END %] [% IF ( SEARCH_RESULT.withdrawncount ) %] Dừng lưu thông ([% SEARCH_RESULT.withdrawncount %]), [% END %] [% UNLESS ( SEARCH_RESULT.hidelostitems ) %][% IF ( SEARCH_RESULT.itemlostcount ) %] Mất ([% SEARCH_RESULT.itemlostcount %]),[% END %][% END %] [% IF ( SEARCH_RESULT.damagedcount ) %] Hư hỏng ([% SEARCH_RESULT.damagedcount %]),[% END %] [% IF ( SEARCH_RESULT.orderedcount ) %] Đang đặt mua ([% SEARCH_RESULT.orderedcount %]),[% END %] [% IF ( SEARCH_RESULT.onholdcount ) %] Được đặt mượn ([% SEARCH_RESULT.onholdcount %]),[% END %] [% IF ( SEARCH_RESULT.intransitcount ) %] Đang vận chuyển ([% SEARCH_RESULT.intransitcount %]),[% END %] </span>
+ </span> <!-- / .results_summary -->
+ [% END # / IF OPACXSLTResultsDisplay %]
+
+ [% IF ( SEARCH_RESULT.score_avg ) %]
+ <div class="results_summary">
+ [% FOREACH i  IN [ 1 2 3 4 5  ] %]
+ [% IF ( SEARCH_RESULT.score_int >= i ) %]
+ <div class="star-rating rater-[% i %] star star-rating-applied star-rating-readonly star-rating-on"><a title="[% i %]">[% i %]</a></div>
+ [% ELSE   %]
+ <div class="star-rating rater-[% i %] star star-rating-applied star-rating-readonly"><a title="[% i %]">[% i %]</a></div>
+ [% END %]
+ [% END %]
+ <span id="babeltheque-rating_total_[% SEARCH_RESULT.biblionumber %]">&nbsp;&nbsp; [% SEARCH_RESULT.score_avg %] / 5 (trong [% SEARCH_RESULT.num_scores %] đánh giá)</span>
+
+ [% IF ( SEARCH_RESULT.num_critics ) %]
+ <span class="social_data">[% SEARCH_RESULT.num_critics %] Đánh giá của người dùng</span>
+ [% END %]
+ [% IF ( SEARCH_RESULT.num_critics_pro ) %]
+ <span class="social_data">[% SEARCH_RESULT.num_critics_pro %] Đánh giá chuyên môn</span>
+ [% END %]
+ [% IF ( SEARCH_RESULT.num_videos ) %]
+ <span class="social_data">[% SEARCH_RESULT.num_videos %] Trích đoạn phim</span>
+ [% END %]
+ [% IF ( SEARCH_RESULT.num_quotations ) %]
+ <span class="social_data">[% SEARCH_RESULT.num_quotations %] Trích dẫn</span>
+ [% END %]
+ </div> <!-- / .results_summary -->
+ [% END # / IF SEARCH_RESULT.score_avg %]
+
+ [% IF ( LibraryThingForLibrariesID ) %]
+ <div class="ltfl_reviews"></div>
+ [% END %]
+
+ [% IF ( TagsShowEnabled && SEARCH_RESULT.TagLoop.size ) %]
+ <div class="results_summary tags">
+ <span class="label">Từ khóa:</span>
+ <ul>
+ [% FOREACH TagLoo IN SEARCH_RESULT.TagLoop %]
+ <li>
+ <a href="/cgi-bin/koha/opac-search.pl?tag=[% TagLoo.term |url %]&amp;q=[% TagLoo.term |url %]">[% TagLoo.term %]</a>
+ <span class="weight">([% TagLoo.weight_total %])</span>
+ </li>
+ [% END %]
+ </ul>
+ </div>
+ [% END %]
+
+ [% IF ( SEARCH_RESULT.searchhighlightblob ) %]
+ <span class="results_summary">
+ <span class="label">Phù hợp:</span>
+ [% SEARCH_RESULT.searchhighlightblob %]
+ </span>
+ [% END %]
+
+ [% IF ( OpacStarRatings == 'all' ) %]
+ <div class="results_summary ratings">
+ [% FOREACH i  IN [ 1 2 3 4 5  ] %]
+ [% IF ( SEARCH_RESULT.rating_avg == i ) %]
+ <input class="star" type="radio"  name="rating-[% SEARCH_RESULT.biblionumber %]" value="[% i %]" checked="checked" disabled="disabled"   />
+ [% ELSE   %]
+ <input class="star" type="radio"  name="rating-[% SEARCH_RESULT.biblionumber %]" value="[% i %]" disabled="disabled"   />
+ [% END %]
+ [% END %]
+
+ <input type="hidden" name="biblionumber"  value="[% SEARCH_RESULT.biblionumber %]" />
+ <input type="hidden" name="loggedinuser"  value="[% loggedinuser %]" />
+
+ [% IF SEARCH_RESULT.rating_total && SEARCH_RESULT.rating_total > 0  %]
+ <span id="rating_total_[% SEARCH_RESULT.biblionumber %]">&nbsp;&nbsp;([% SEARCH_RESULT.rating_total %] phiếu)</span>
+ [% ELSE %]
+ <br />
+ [% END %]
+ </div> <!-- / .results_summary -->
+ [% END # / IF OpacStarRatings %]
+
+ <div class="actions-menu">
+ [% IF Koha.Preference( 'RequestOnOpac' ) == 1 %]
+ [% UNLESS ( SEARCH_RESULT.norequests ) %]
+ [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && AllowOnShelfHolds ) %]
+ <span class="actions"><a class="hold" href="/cgi-bin/koha/opac-reserve.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]">Đặt mượn</a></span><!-- add back when available 0 holds in queue-->
+ [% ELSE %]
+ [% IF ( SEARCH_RESULT.itemsissued ) %]
+ <a class="hold" href="/cgi-bin/koha/opac-reserve.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]">Đặt mượn</a><!-- add back when available 0 holds in queue-->
+ [% END %]
+ [% END # / IF opacuserlogin && AllowOnShelfHolds %]
+ [% END # UNLESS SEARCH_RESULT.norequests %]
+ [% END # IF RequestOnOpac %]
+
+ [% IF ( TagsInputEnabled ) %]
+ [% IF ( loggedinusername ) %]
+ <span class="actions"><a class="tag_add" id="tag_add[% SEARCH_RESULT.biblionumber %]" href="#">Tạo từ khóa</a></span>
+ <div id="tagform[% SEARCH_RESULT.biblionumber %]" class="tag_results_input" style="display:none;">
+ <label for="newtag[% SEARCH_RESULT.biblionumber %]">Thêm từ khóa, ngăn cách bằng dấu phẩy:</label>
+ <input type="text" name="newtag[% SEARCH_RESULT.biblionumber %]" id="newtag[% SEARCH_RESULT.biblionumber %]" maxlength="100" />
+ <input type="submit" class="btn btn-small tagbutton" title="[% SEARCH_RESULT.biblionumber %]" value="Tạo" name="tagbutton" />
+ <a class="cancel_tag_add" id="cancel[% SEARCH_RESULT.biblionumber %]" href="#">(Hoàn thành)</a>
+ </div>
+ <span id="newtag[% SEARCH_RESULT.biblionumber %]_status" class="tagstatus" style="display:none;">
+ Trạng thái từ khóa. </span>
+ [% ELSIF ( loop.first ) %]
+ <span class="actions"><span id="login4tags">Đăng nhập để thêm từ khóa.</span></span>
+ [% END # IF loggedinusername %]
+ [% END # if TagsInputEnabled %]
+
+ [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && loggedinusername && ( Koha.Preference( 'virtualshelves' ) == 1 ) ) %]
+ <span class="actions"><a class="addtoshelf" href="/cgi-bin/koha/opac-addbybiblionumber.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]" onclick="Dopop('opac-addbybiblionumber.pl?biblionumber=[% SEARCH_RESULT.biblionumber %]'); return false;">Thêm vào giá sách ảo</a></span>
+ [% END %]
+
+ [% IF Koha.Preference( 'opacbookbag' ) == 1 %]
+ [% IF ( SEARCH_RESULT.incart ) %]
+ <span class="actions"><a class="addtocart cart[% SEARCH_RESULT.biblionumber %]" href="#" onclick="addRecord('[% SEARCH_RESULT.biblionumber %]'); return false;">Trong giỏ tài liệu</a> <a class="cartRemove cartR[% SEARCH_RESULT.biblionumber %]" href="#" onclick="delSingleRecord('[% SEARCH_RESULT.biblionumber %]'); return false;">(Loại bỏ)</a></span>
+ [% ELSE %]
+ <span class="actions"><a class="addtocart cart[% SEARCH_RESULT.biblionumber %]" href="#" onclick="addRecord('[% SEARCH_RESULT.biblionumber %]'); return false;">Thêm vào giỏ tài liệu</a> <a style="display:none;" class="cartRemove cartR[% SEARCH_RESULT.biblionumber %]" href="#" onclick="delSingleRecord('[% SEARCH_RESULT.biblionumber %]'); return false;">(Loại bỏ)</a></span>
+ [% END %]
+ [% END # / IF opacbookbag %]
+ </div>
+ </td>
+ </tr>
+ [% END # / FOREACH SEARCH_RESULT %]
+ </table>
+ </form> <!-- / #bookbag_form -->
+
+ <form id="hold_form" name="hold_form" method="get" action="/cgi-bin/koha/opac-reserve.pl">
+ <!-- The value will be set by holdBiblioNums() in basket.js -->
+ <input id="hold_form_biblios" type="hidden" name="biblionumbers" value=""/>
+ </form>
+ </div> <!-- / .searchresults -->
+
+ <div id="bottom-pages">[% INCLUDE 'page-numbers.inc' %]</div>
+
+ [% END # / IF total %]
+
+ [% IF Koha.Preference( 'suggestion' ) == 1 %]
+ [% IF Koha.Preference( 'AnonSuggestions' ) == 1 %]
+ <div class="suggestion" style="text-align: center;">Bạn không tìm thấy tài liệu mình cần?<br /> Vui lòng gửi <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">đề xuất mua cho thư viện</a></div>
+ [% ELSE %]
+ [% IF ( loggedinusername ) %]
+ <div class="suggestion">
+ Bạn không tìm thấy tài liệu mình cần?<br /> Vui lòng gửi <a href="/cgi-bin/koha/opac-suggestions.pl?op=add">đề xuất mua cho thư viện</a>
+ </div>
+ [% END %]
+ [% END %]
+ [% END %]
+ </div> <!-- / #userresults -->
+ </div> <!-- /.span10/12 -->
+ </div> <!-- / .row-fluid -->
+ </div> <!-- / .container-fluid -->
+ </div><!-- / .main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %]
+[% IF ( LibraryThingForLibrariesID ) %]
+ [% IF ( using_https ) %]
+ <script src="https://ltfl.librarything.com/forlibraries/widget.js?id=[% LibraryThingForLibrariesID %]&amp;systype=koha" type="text/javascript"></script>
+ [% ELSE %]
+ <script src="http://ltfl.librarything.com/forlibraries/widget.js?id=[% LibraryThingForLibrariesID %]&amp;systype=koha" type="text/javascript"></script>
+ [% END %]
+[% END %]
+[% IF ( OpacStarRatings == 'all' || Koha.Preference('Babeltheque') ) %]<script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/plugins/jquery.rating.js"></script>[% END %]
+[% IF ( OverDriveEnabled ) %]<script type="text/javascript" src="[% interface %]/[% theme %]/js/overdrive.js"></script>[% END %]
+<script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+[% IF ( OpacHighlightedWords ) %]<script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/plugins/jquery.highlight-3.js"></script>
+[% END %]<script type="text/javascript">
+//<![CDATA[
+[% IF ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'RequestOnOpac' ) == 1 ) %]
+function holdMultiple() {
+    var checkedBiblioNums = ""; // Separated by "/"
+    var checkedCount = 0;
+    if(document.bookbag_form.biblionumber.length > 0) {
+        for (var i=0; i < document.bookbag_form.biblionumber.length; i++) {
+            if (document.bookbag_form.biblionumber[i].checked) {
+                checkedBiblioNums += (document.bookbag_form.biblionumber[i].value + "/");
+                checkedCount++;
+            }
+        }
+    }
+
+    if (checkedCount > 0) {
+        holdBiblioNums(checkedBiblioNums);
+    } else {
+        alert(MSG_NO_RECORD_SELECTED);
+    }
+}
+
+function holdBiblioNums(numList) {
+    // numList: biblio numbers separated by "/"
+    $("#hold_form_biblios").attr("value", numList);
+    $("#hold_form").submit();
+}[% END %]
+
+[% IF ( TagsInputEnabled && loggedinusername ) %]
+function tagSelected() {
+    var checkedBoxes = $(".searchresults :checkbox:checked");
+    if ($(checkedBoxes).size() == 0) {
+        alert(MSG_NO_RECORD_SELECTED);
+    } else {
+        $("#tagsel_tag").hide();
+        $(".resort").hide();
+        $("#tagsel_form").show();
+    }
+}
+
+function tagCanceled() {
+    $("#tagsel_form").hide();
+    $("#tagsel_tag").show();
+    $(".resort").show();
+    $("#tagsel_new").val("");
+    $("#tagsel_status, .tagstatus").empty().hide();
+}
+
+function tagAdded() {
+    var checkedBoxes = $(".searchresults :checkbox:checked");
+    if ($(checkedBoxes).size() == 0) {
+        alert(MSG_NO_RECORD_SELECTED);
+        return false;
+    }
+
+    var tag = $("#tagsel_new").val();
+    if (!tag || (tag == "")) {
+        alert(MSG_NO_TAG_SPECIFIED);
+        return false;
+    }
+
+    var bibs = [];
+    for (var i = 0; i < $(checkedBoxes).size(); i++) {
+        var box = $(checkedBoxes).get(i);
+        bibs[i] = $(box).val();
+    }
+
+    KOHA.Tags.add_multitags_button(bibs, tag);
+    return false;
+}[% END %]
+
+
+function enableCheckboxActions(){
+    // Enable/disable controls if checkboxes are checked
+    var checkedBoxes = $(".checkboxed input:checkbox:checked");
+    var controls = $("#selections-toolbar .links a, #selections-toolbar .links input, #selections-toolbar .links select, , #selections-toolbar .links label")
+    if ($(checkedBoxes).size()) {
+      $("#selections").html(_("Với nhan đề được chọn: "));
+      $(controls).removeClass("disabled");
+    } else {
+      $("#selections").html(_("Chọn nhan đề để: "));
+      $(controls).addClass("disabled");
+    }
+}
+
+[% IF ( OpacHighlightedWords ) %]
+var q_array = new Array();  // holds search terms if available
+
+function highlightOff() {
+    $("td").removeHighlight();
+    $(".highlight_toggle").toggle();
+}
+function highlightOn() {
+    var x;
+    for (x in q_array) {
+        q_array[x] = q_array[x].replace(/\w*:([\w])/, "$1");
+        q_array[x] = q_array[x].toLowerCase();
+        var myStopwords = "[% Koha.Preference('NotHighlightedWords') %]".toLowerCase().split('|');
+        if ( (q_array[x].length > 0) && ($.inArray(q_array[x], myStopwords) == -1) ) {
+            $(".title").highlight(q_array[x]);
+            $(".author").highlight(q_array[x]);
+            $(".results_summary").highlight(q_array[x]);
+        }
+    }
+    $(".highlight_toggle").toggle();
+}
+[% END %]
+$(document).ready(function(){
+    [% IF ( OpacHighlightedWords ) %]
+        $('a.title').each(function() {
+            $(this).attr("href", $(this).attr("href") + "&query_desc=[% query_desc | uri %]");
+        });
+    [% END %]
+
+    $(".cb").click(function(){
+      enableCheckboxActions();
+    });
+    enableCheckboxActions();
+
+    [% IF ( IDreamBooksResults ) %]
+        $('.idbresult').each(function() {
+            var isbn = $(this).children('a').text().replace(/\s*/,'');
+            var element = this;
+
+            if ($.browser.msie && parseInt($.browser.version, 10) >= 8 && window.XDomainRequest) {
+            // Use Microsoft XDR for IE version 8 or above
+                var xdr = new XDomainRequest();
+                xdr.open("get", "http://idreambooks.com/newbooks/api.json?q="+encodeURIComponent(isbn)+"&key=8bf66516232d1b72f3e47df939653e1e");
+                xdr.onload = function() {
+                    json = 'json = '+xdr.responseText; // the string now looks like..  json = { ... };
+                    eval(json); // json is now a regular JSON object
+                    if(json.total_results > 0 && json.book.rating > 0){
+                        $(element).children('a').html("<img src='"+json.book.to_read_or_not_small+"' alt='"+json.book.title+" Tác giả: "+json.book.author+"' title='Đánh giá dựa trên cơ sở nhận xét của "+json.book.title+"'>"+json.book.rating+"%");
+                        $(element).show();
+                    } else {
+                        $(element).remove();
+                    }
+                }
+                xdr.send();
+            } else {
+                $.getJSON("http://idreambooks.com/newbooks/api.json?q="+encodeURIComponent(isbn)+"&key=8bf66516232d1b72f3e47df939653e1e", function(json){
+                    if(json.total_results > 0 && json.book.rating > 0){
+                        $(element).children('a').html("<img src='"+json.book.to_read_or_not_small+"' alt='"+json.book.title+" Tác giả: "+json.book.author+"' Đánh giá dựa trên cơ sở nhận xét của "+json.book.title+"'>"+json.book.rating+"%");
+                        $(element).show();
+                    } else {
+                        $(element).remove();
+                    }
+                });
+            }
+        });
+    [% END %]
+
+    var param1 = "";
+    [% IF ( ( Koha.Preference( 'opacbookbag' ) == 1 ) || ( Koha.Preference( 'virtualshelves' ) == 1 ) || loggedinusername ) %]
+    param1 += "<span id=\"selections\">"+_("Chọn nhan đề để: ")+"</span>";
+    [% END %]
+
+[% IF Koha.Preference( 'opacbookbag' ) == 1 %]
+    [% IF Koha.Preference( 'virtualshelves' ) == 1 %]
+    param1 += "<select class=\"disabled\" name=\"addto\" id=\"addto\"><option>"+_("Thêm vào...")+"</option>";
+    [% IF Koha.Preference( 'opacbookbag' ) == 1 %]    param1 += "<option value=\"addtocart\">"+_("Giỏ tài liệu")+"<\/option>";
+    [% END %][% IF Koha.Preference( 'virtualshelves' ) == 1 %][% IF ( loggedinusername ) %][% IF ( addbarshelves ) %]
+    param1 += "<optgroup label=\""+_("Giá sách cá nhân :")+"\">";[% FOREACH addbarshelvesloo IN addbarshelvesloop %]
+    param1 += "<option id=\"s[% addbarshelvesloo.shelfnumber %]\" value=\"addtolist\">[% addbarshelvesloo.shelfname |html %]<\/option>";[% END %]
+    param1 += "<\/optgroup>";[% END %]
+    [% IF ( addpubshelves ) %]param1 += "<optgroup label=\""+_("Giá sách cộng đồng:")+"\">"[% FOREACH addpubshelvesloo IN addpubshelvesloop %]+"<option id=\"s[% addpubshelvesloo.shelfnumber %]\" value=\"addtolist\">[% addpubshelvesloo.shelfname |html %]<\/option>"[% END %];
+    param1 += "<\/optgroup>";[% END %]
+    [% IF (( addbarshelvesloop && addbarshelvesloop.size>9) || (addpubshelvesloop && addpubshelvesloop.size>9 )) %]
+        param1 += "<option value=\"morelists\">[ "+_("Giá sách ảo")+" ]<\/option>";
+    [% END %]
+    param1 += "<option value=\"newlist\">[ "+_("Tạo giá sách ảo")+" ]<\/option>";
+    [% END %]
+    [% END %]
+    param1 += "<\/select> <input type=\"submit\" class=\"btn btn-small\" value=\""+_("Lưu")+"\" />";
+    [% ELSE %]
+        param1 += "<a id=\"addto\" class=\"addtocart\" href=\"#\">" + _("Thêm vào giỏ tài liệu") + "<\/a>";
+    [% END %]
+[% ELSE %]
+        param1 += "<select name=\"addto\" id=\"addto\"><option value=\"\">"+_("Thêm vào giá sách ảo: ")+"<\/option>";
+[% IF Koha.Preference( 'virtualshelves' ) == 1 %][% IF ( loggedinusername ) %][% IF ( addbarshelves ) %]
+    param1 += "<optgroup label=\""+_("Giá sách cá nhân:")+"\">";[% FOREACH addbarshelvesloo IN addbarshelvesloop %]
+    param1 += "<option id=\"s[% addbarshelvesloo.shelfnumber %]\" value=\"addtolist\">[% addbarshelvesloo.shelfname |html %]<\/option>";[% END %]
+    param1 += "<\/optgroup>";[% END %]
+    [% IF ( addpubshelves ) %]param1 += "<optgroup label=\""+_("Giá sách cộng đồng:")+"\">"[% FOREACH addpubshelvesloo IN addpubshelvesloop %]+"<option id=\"s[% addpubshelvesloo.shelfnumber %]\" value=\"addtolist\">[% addpubshelvesloo.shelfname |html %]<\/option>"[% END %][% END %]
+    param1 +="<\/optgroup><option value=\"newlist\">[ "+_("Tạo giá sách ảo")+" ]<\/option>"
+    [% END %]
+    [% END %]
+    param1 += "<\/select> <input type=\"submit\" class=\"btn btn-small disabled\" value=\""+_("Lưu")+"\" />";
+[% END %]
+
+    $('#sortsubmit').hide();
+    $('.resort').change(function() {
+        $('#bookbag_form').submit();
+    });
+    $("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Bỏ tất cả")+"<\/a>");
+    $("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Chọn tất cả")+"<\/a>");
+
+[% IF Koha.Preference( 'opacbookbag' ) == 1 %]
+    $("span.addto").html(param1);
+[% ELSE %]
+    [% IF ( ( Koha.Preference( 'virtualshelves' ) == 1 ) && loggedinusername ) %]
+        $("span.addto").html(param1);
+    [% END %]
+[% END %]
+
+[% IF ( ( Koha.Preference( 'opacbookbag' ) == 1 ) || ( Koha.Preference( 'virtualshelves' ) == 1 ) ) %]
+    [% IF Koha.Preference( 'virtualshelves' ) == 1 %]
+        $("#addto").on("change",function(){
+            cartList();
+        });
+        $(".addto").find("input:submit").click(function(){
+            cartList();
+            return false;
+        });
+    [% ELSE %]
+        $("#addto").on("click",function(){
+            cartList();
+            return false;
+        });
+    [% END %]
+[% END %]
+
+    function cartList(){
+        addtoOption = $("#addto").find("option:selected");
+        addtoval = addtoOption.val();
+        if(addtoval == "addtolist"){
+            var shelfnumber = addtoOption.attr("id").replace("s","");
+            if (vShelfAdd()) {
+                Dopop('/cgi-bin/koha/opac-addbybiblionumber.pl?selectedshelf='+shelfnumber+'&' + vShelfAdd());
+            }
+            return false;
+        } else if(addtoval == "newlist"){
+            [% IF ( loggedinusername ) %]if (vShelfAdd()) {
+                Dopop('/cgi-bin/koha/opac-addbybiblionumber.pl?newshelf=1&' + vShelfAdd());
+            }[% ELSE %]
+                alert(_("Bạn phải đăng nhập để tạo và thêm tài liệu vào giá sách ảo"));
+            [% END %]
+            return false;
+        } else if(addtoval == "morelists"){
+            [% IF ( loggedinusername ) %]
+                if (vShelfAdd()) {
+                    Dopop('/cgi-bin/koha/opac-addbybiblionumber.pl?' + vShelfAdd());
+                }
+            [% ELSE %]
+                alert(_("Bạn phải đăng nhập để tạo và thêm tài liệu vào giá sách ảo"));
+            [% END %]
+            return false;
+        }
+        if(addtoval == "addtocart" || $("#addto").attr("class") == "addtocart"){
+            addMultiple();
+            return false;
+         }
+    }
+    $("#CheckAll").click(function(){
+        $("#bookbag_form").checkCheckboxes();
+        enableCheckboxActions();
+        return false;
+    });
+    $("#CheckNone").click(function(){
+        $("#bookbag_form").unCheckCheckboxes();
+        enableCheckboxActions();
+        return false;
+    });
+
+[% IF ( ( Koha.Preference( 'RequestOnOpac' ) == 1 ) && ( Koha.Preference( 'opacuserlogin' ) == 1 ) && DisplayMultiPlaceHold ) %]
+    $("#placehold").html("<input class=\"hold disabled\" type=\"submit\" value=\""+_("Đặt mượn")+"\"/>");
+    $("#placehold").find("input:submit").click(function(){
+        holdMultiple();
+        return false;
+    });
+[% END %]
+
+[% IF ( query_desc ) %]
+    var query_desc = "[% query_desc |replace("'", "\'") |replace('\n', '\\n') |replace('\r', '\\r') |html %]";
+    var querystring = "[% querystring |replace("'", "\'") |replace('\n', '\\n') |replace('\r', '\\r') |html %]";
+    [% IF ( OpacHighlightedWords ) %]
+        q_array = query_desc.split(" ");
+        // ensure that we don't have "" at the end of the array, which can
+        // break the highlighter
+        while (q_array.length > 0 && q_array[q_array.length-1] == "") {
+            q_array = q_array.splice(0,-1);
+        }
+        highlightOn();
+        $("#highlight_toggle_on" ).hide().click(function() {highlightOn() ;});
+        $("#highlight_toggle_off").show().click(function() {highlightOff();});
+    [% END %]
+    [% IF ( OverDriveEnabled ) %]
+        var $overdrive_results = $( '<span id="overdrive-results">' + _( 'Đang tìm kiếm OverDrive...' ) + ' <img class="throbber" src="[% interface %]/lib/jquery/plugins/themes/classic/throbber.gif" /></span>' );
+        $( '#numresults' ) .append( ' ' )
+            .append( $overdrive_results );
+        KOHA.OverDrive.Search( "[% OverDriveLibraryID %]", querystring, 1, 0, function( data ) {
+            if ( data.error ) {
+                $overdrive_results.html( _( 'Lỗi tìm kiếm bộ sưu tập OverDrive' ) );
+                return;
+            }
+
+            if ( data.totalItems ) {
+                $overdrive_results.html( _( 'Tìm thấy' ) + ' <a href="/cgi-bin/koha/opac-overdrive-search.pl?q=' + escape( querystring ) + '">' + data.totalItems + ' ' + _( 'results' ) + '</a> ' + _( 'trong bộ sưu tập OverDrive' ) );
+            } else {
+                $overdrive_results.remove();
+            }
+        } );
+    [% END %]
+[% END %]
+
+[% IF ( TagsInputEnabled && loggedinusername ) %]
+    $("#tagsel_tag").click(function(){
+        tagSelected();
+        return false;
+    });
+    $("#tagsel_cancel").click(function(){
+        tagCanceled();
+        return false;
+    });
+    $("#tagsel_button").click(function(){
+        tagAdded();
+        return false;
+    });
+
+    $(".tag_add").click(function(){
+        var thisid = $(this).attr("id");
+        thisid = thisid.replace("tag_add","");
+        $(this).addClass("hidden");
+        $("#tagform"+thisid).show();
+        $("#newtag"+thisid).focus();
+        $("#newtag"+thisid+"_status").empty().hide();
+        return false;
+    });
+    $(".cancel_tag_add").click(function(){
+        var thisid = $(this).attr("id");
+        thisid = thisid.replace("cancel","");
+        $("#tagform"+thisid).hide();
+        $("#tag_add"+thisid).removeClass("hidden");
+        $("#newtag"+thisid).val("");
+        $("#newtag"+thisid+"_status").empty().hide();
+        return false;
+    });
+    $(".tagbutton").click(function(){
+        var thisid = $(this).attr("title");
+        var tag = $("#newtag"+thisid).val();
+        if (!tag || (tag == "")) {
+            alert(MSG_NO_TAG_SPECIFIED);
+            return false;
+        }
+        KOHA.Tags.add_tag_button(thisid, tag);
+        return false;
+    });
+[% END %]
+
+[% IF OpenLibraryCovers %]KOHA.OpenLibrary.GetCoverFromIsbn();[% END %]
+[% IF OPACLocalCoverImages %]KOHA.LocalCover.GetCoverFromBibnumber(false);[% END %]
+[% IF ( GoogleJackets ) %]KOHA.Google.GetCoverFromIsbn();[% END %]
+
+[% IF ( DidYouMean ) %]
+    $("#didyoumean").load("/cgi-bin/koha/svc/suggestion?render=stub&q=[% querystring |uri %]",
+        function() {
+            $(".searchsuggestion").parent().parent().css({
+                "border-color": "#F4ECBE",
+                "background-color": "#FFFBEA"
+            });
+        });
+[% END %]
+
+});
+//]]>
+</script>
+[% END %]

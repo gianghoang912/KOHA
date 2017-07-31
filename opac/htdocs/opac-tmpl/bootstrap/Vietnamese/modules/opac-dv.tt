@@ -1,0 +1,67 @@
+[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] 
+
+
+</head>
+[% INCLUDE 'bodytag.inc' bodyid='opac-main' %]
+[% INCLUDE 'masthead.inc' %]
+
+
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a><span class="divider">›</span></li>
+ <li><a href="/cgi-bin/koha/opac-dv.pl">Dịch vụ</a></li>
+ </ul>
+
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( loggedinusername ) %]
+ <div id="loggedin" class="container-fluid">
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+
+ <div class="row-fluid">
+	
+ <div class="span9">
+
+	<div class="row-fluid">
+	[% IF dichvu_count %]
+	<h3>Dịch vụ</h1><br>
+		<div class="dvtv">
+			[% FOREACH dichvu IN dichvus %]
+				<div class="dvitem">
+					<div class="imgdv"><a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% dichvu.idnew %]&idgroup=[% dichvu.idgroup %]">
+					<img src="[% dichvu.img %]">
+					</a></div>
+					<div class="dv">
+						<h4><a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% dichvu.idnew %]&idgroup=[% dichvu.idgroup %]">[% dichvu.title %]</a></h4>
+						<div id="ppp">[% dichvu.sub %]</div>
+					</div>
+				</div>
+			[% END %]
+		</div>
+	[% ELSE %]
+		<h4> Trang web này đang được cập nhập, vui lòng quay trở lại sau! Xin cảm ơn sự quan tâm của các bạn tới trang web này của chúng tôi </h4>
+	[% END %]
+	</div>
+ </div> <!-- / .span 7/9 -->
+
+ 
+ <div class="span3">
+
+	
+
+[% INCLUDE "nav-sukien.inc" %]
+[% INCLUDE "newbooksm.inc" %]
+[% INCLUDE "lienketweb.inc" %]
+ </div> <!-- / .span3 -->
+
+
+ </div> <!-- /.container-fluid -->
+ </div> <!-- /.row-fluid -->
+</div> <!-- /.main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

@@ -1,0 +1,197 @@
+[% USE Koha %]
+[% USE AuthorisedValues %]
+[% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %] &rsaquo;
+[% IF ( op_add ) %]Tặng sách[% END %]
+[% IF ( op_else ) %]Tặng sách[% END %]
+[% INCLUDE 'doc-head-close.inc' %]
+[% BLOCK cssinclude %][% END %]
+</head>
+[% IF ( loggedinusername ) %][% INCLUDE 'bodytag.inc' bodyid='opac-usersuggestions' bodyclass='scrollto' %][% ELSE %][% INCLUDE 'bodytag.inc' bodyid='opac-suggestions' bodyclass='scrollto' %][% END %]
+[% INCLUDE 'masthead.inc' %]
+
+ <div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a> <span class="divider">&rsaquo;</span></li>
+ <li><a href="/cgi-bin/koha/opac-user.pl">[% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</a> <span class="divider">&rsaquo;</span></li>
+ <li><a href="#">Tặng sách</a></li>
+ </ul>
+
+ <div class="container-fluid">
+ <div class="row-fluid">
+ <div class="span2">
+ <div id="navigation">
+ [% INCLUDE 'navigation.inc' IsPatronPage=1 %]
+ </div>
+ </div>
+ <div class="span10">
+ <div id="usersuggestions" class="maincontent">
+ [% IF ( op_add ) %]
+ <h1>TẶNG SÁCH THƯ VIỆN</h1>
+
+ <p>Cám ơn đọc giả đã quan tâm và đóng góp tài liệu cho thư viện. Chúng tôi sẽ liên hệ với bạn trong thời gian sớm nhất.</p>
+ <p>Chú ý: Vui lòng khai báo đầy đủ thông tin liên hệ để chúng tôi có thể liên lạc với bạn.</p>
+
+ <form action="/cgi-bin/koha/opac-tangsach.pl" method="post">
+ <fieldset class="rows">
+ <ol>
+ <li><label class="required" for="title">Nhan đề: </label><input type="text" id="title" name="title" class="span6" maxlength="255" /></li>
+ <li><label for="author">Tác giả:</label><input type="text" id="author" name="author" class="span6" maxlength="80" /></li>
+ <li><label for="copyrightdate">Năm xuất bản:</label><input type="text" id="copyrightdate" name="copyrightdate" size="4" maxlength="4" /></li>
+ <li><label for="publishercode">Nhà xuất bản:</label><input type="text" id="publishercode" name="publishercode" class="span6" maxlength="80" /></li>
+ <li><label for="isbn">Lý do:</label><input type="text" value="Tặng sách" id="isbn" name="isbn"  maxlength="80" /></li>
+ [% IF ( patron_reason_loop ) %]
+ <li>
+ <label for="patronreason">Lý do đề xuất mua: </label>
+ <select name="patronreason" id="patronreason">
+ <option value="">-- Chọn --</option>
+ [% FOREACH patron_reason_loo IN patron_reason_loop %]
+ <option value="[% patron_reason_loo.authorised_value %]">[% patron_reason_loo.lib %]</option>
+ [% END %]
+ </select>
+ </li>
+ [% END %]
+ <li>
+ <label class="required" for="note" placeholder=" hello">Thông tin liên hệ:</label>
+ <textarea name="note" id="note" rows="5" cols="40"></textarea>
+ <p style=" margin-left:150px; color:#736868; font-size:13px">Vui lòng khai báo đầy đủ họ tên, điện thoại, email để chúng tôi có thể liên hệ với bạn.</p>
+ </li>
+
+ <!-- Add a hidden 'negcap' field -->
+ <li id="negcap" style="position: absolute; left: -2000px;">
+ negcap <input type="text" name="negcap"/>
+ </li>
+
+ </ol>
+ </fieldset>
+ <fieldset class="action">
+ <input type="hidden" name="suggestedby" value="[% suggestedbyme %]" />
+ <input type="hidden" name="op" value="add_confirm" />
+ <input type="submit" onclick="Check(this.form); return false;" class="btn" value="Gửi thông tin" /> <a class="action" href="/cgi-bin/koha/opac-tangsach.pl">Hủy bỏ</a>
+ </fieldset>
+ </form>
+ [% END #  IF op_add %]
+
+ [% IF ( op_else ) %]
+ <h1>
+ [% IF Koha.Preference( 'OPACViewOthersSuggestions' ) == 1 %]
+ Đề xuất tặng sách thư viện
+ [% ELSE %]
+ [% IF ( loggedinusername ) %]
+ Đề xuất tặng sách thư viện
+ [% ELSE %]
+ Đề xuất tặng sách thư viện
+ [% END %]
+ [% END %]
+ </h1>
+
+ [% IF ( submitted ) %]<div class="alert alert-info">Đề xuất tặng sách của bạn đã được gửi tới thư viện. Xin cám ơn!</div>[% END %]
+
+ [% IF ( suggestions_loop ) %]
+ <form action="/cgi-bin/koha/opac-tangsach.pl" method="post" id="myform">
+ <input type="hidden" name="op" value="delete_confirm" />
+ <div id="toolbar" class="toolbar clearfix">
+ [% IF ( loggedinusername || ( Koha.Preference( 'AnonSuggestions' ) == 1 ) ) %]
+ <a class="new" href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tạo đề xuất</a>
+ [% END %]
+ </div>
+ </form>
+ [% ELSE %]
+  [% IF ( loggedinusername || ( Koha.Preference( 'AnonSuggestions' ) == 1 ) ) %]
+ <p><a class="new" href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tạo đề xuất</a></p>
+ [% END %]
+ [% END # / IF suggestions_loop %]
+
+ [% END # IF op_else %]
+ </div> <!-- / #usersuggestions -->
+ </div> <!-- / .span10 -->
+ </div> <!-- / .row-fluid -->
+ </div> <!-- / .container-fluid -->
+ </div> <!-- / .main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %]
+<script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+[% INCLUDE 'datatables.inc' %]
+<script type="text/javascript">
+    //<![CDATA[
+    [% IF ( loggedinusername ) %]
+        function enableCheckboxActions(){
+            // Enable/disable controls if checkboxes are checked
+            var checkedBoxes = $(".checkboxed input:checkbox:checked");
+            if ($(checkedBoxes).size()) {
+              $("#selections").html(_("Với đề xuất được chọn: "));
+              $("#selections-toolbar .links a").removeClass("disabled");
+            } else {
+              $("#selections").html(_("Chọn đề xuất để: "));
+              $("#selections-toolbar .links a").addClass("disabled");
+            }
+        }
+    [% END %]
+
+    $(function() {
+        $("#suggestt").dataTable($.extend(true, {}, dataTablesDefaults, {
+            "aaSorting": [[ 1, "asc" ]],
+            "aoColumnDefs": [
+              [% IF ( loggedinusername ) %]{ "aTargets": [ 0 ], "bSortable": false, "bSearchable": false }[% END %]
+            ],
+            "aoColumns": [
+                [% IF ( loggedinusername ) %]null,[% END %]
+                { "sType": "anti-the" },
+                null,
+                [% IF ( OPACViewOthersSuggestions ) %]null,[% END %]
+                [% IF Koha.Preference( 'OpacSuggestionManagedBy' ) %]null,[% END %]
+                null
+            ]
+        }));
+        [% IF ( loggedinusername ) %]$("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Bỏ tất cả")+"<\/a>");
+        $("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Chọn tất cả")+"<\/a>");
+        $("#CheckAll").click(function(){
+            $(".checkboxed").checkCheckboxes();
+            enableCheckboxActions();
+            return false;
+        });
+        $("#CheckNone").click(function(){
+            $(".checkboxed").unCheckCheckboxes();
+            enableCheckboxActions();
+            return false;
+        });
+        $(".cb").click(function(){
+          enableCheckboxActions();
+        });
+        $("#removeitems").html("<a href=\"#\" class=\"removeitems tag_hides disabled\">"+_("Xóa")+"</a>")
+        .click(function(e){
+          e.preventDefault();
+          $("#myform").submit();
+          return false;
+        });
+        enableCheckboxActions();
+        $("#myform").on('submit', function() {
+          if ( $("input:checked").size() < 1 ) {
+            alert(MSG_NO_SUGGESTION_SELECTED);
+            return false;
+          }
+          return true;
+        });
+        [% END %]
+    });
+
+    function Check(f) {
+        var _alertString="";
+        var alertString2;
+
+        if(f.title.value.length ==0){
+            _alertString += _("- Bạn phải nhập nhan đề tài liệu") + "\n";
+        }
+
+        if (_alertString.length==0) {
+            f.submit();
+        } else {
+            alertString2 = _("Mẫu khai báo không được gửi đi, phát hiện các lỗi sau đây:");
+            alertString2 += "\n------------------------------------------------------------------------------------\n\n";
+            alertString2 += _alertString;
+            alert(alertString2);
+        }
+    }
+//]]>
+</script>
+[% END %]

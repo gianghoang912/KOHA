@@ -1,0 +1,755 @@
+[% USE Branches %]
+[% USE AuthorisedValues %]
+[% USE KohaDates %]
+[% USE Price %]
+[% INCLUDE 'doc-head-open.inc' %]
+<title>Koha &rsaquo; Phân hệ bổ sungs &rsaquo; [% IF ( op_save ) %] [% IF ( suggestionid ) %] Đề xuất mua &rsaquo; Chỉnh sửa đề xuất mua số [% suggestionid %] [% ELSE %] Đề xuất mua &rsaquo; Tạo đề xuất mua [% END %] [% ELSIF ( op == 'show' ) %] Đề xuất mua &rsaquo; Hiển thị đề xuất mua số [% suggestionid %] [% ELSE %] Quản lý đề xuất mua [% END %] </title>
+[% INCLUDE 'doc-head-close.inc' %]
+[% INCLUDE 'calendar.inc' %]
+[% IF ( op == 'show' ) %]
+<script type="text/javascript">
+    // <![CDATA[
+    $(document).ready(function(){
+        $("#deletesuggestion").on("click",function(){
+            return confirm(_("Bạn chắc chắn muốn xóa đề xuất mua này?"));
+        });
+    });
+    // ]]>
+</script>
+[% END %]
+[% IF ( op_else ) %]
+<link rel="stylesheet" type="text/css" href="[% themelang %]/css/datatables.css" />
+[% INCLUDE 'datatables.inc' %]
+<script type="text/javascript" src="[% interface %]/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+<script type="text/javascript">
+// <![CDATA[
+/**
+*  displayOther.
+*  This function display the select or an textaera to write a reason.
+*/
+function displayOther(id,show,hide){
+	$("#"+hide+id).hide();
+	$("#"+show+id).show();
+}
+$(document).ready(function() {
+    $('#suggestiontabs').tabs({
+        // Correct table sizing for tables hidden in tabs
+        // http://www.datatables.net/examples/api/tabs_and_scrolling.html
+        "show": function(event, ui) {
+            var oTable = $('div.dataTables_wrapper>table', ui.panel).dataTable();
+            if ( oTable.length > 0 ) {
+                oTable.fnAdjustColumnSizing();
+            }
+        }
+    });
+    $(".sorted").dataTable($.extend(true, {}, dataTablesDefaults, {
+        "aoColumnDefs": [
+            { "aTargets": [ 0 ], "bSortable": false, "bSearchable": false },
+            { "sType": "anti-the", "aTargets" : [ "anti-the" ] }
+        ],
+        "sPaginationType": "four_button"
+    }));
+[% FOREACH suggestion IN suggestions %]
+// functions for [% suggestion.suggestiontype %] interactions
+    $("#CheckAll[% suggestion.suggestiontype %]").click(function(e){
+		$("#[% suggestion.suggestiontype %]t").checkCheckboxes();
+        e.preventDefault();
+    });
+    $("#UncheckAll[% suggestion.suggestiontype %]").click(function(e){
+		$("#[% suggestion.suggestiontype %]t").unCheckCheckboxes();
+        e.preventDefault();
+	});
+	$("#other_reason[% suggestion.suggestiontype %]").hide();
+    $("#reason[% suggestion.suggestiontype %]").change(function(){
+	    if($(this).val() == "other"){
+			$(this).hide();
+			$("#other_reason[% suggestion.suggestiontype %]").show();
+    }
+    });
+	$("#[% suggestion.suggestiontype %]delete").change(function(){
+		if(this.checked){
+			$("form[name='f[% suggestion.suggestiontype %]'] input[name=op]").attr("value","delete");
+		} else {
+			$("form[name='f[% suggestion.suggestiontype %]'] input[name=op]").attr("value","change");
+		}
+	});
+
+[% END %]
+    $("a[href*=back]").click(function(){
+    var sid = $(this).attr("href").replace(/#back/,"");
+	    $("#reason"+sid).show().find("option[value='']").attr("selected","selected");
+		$("#other_reason"+sid).hide();
+    });
+    $("h4.local_collapse a").click(function(){
+        $(this).parent().parent().find("ol").toggle();
+        return false;
+    });
+    // http://jqueryui.com/demos/datepicker/#date-range
+    var dates = $( "#suggesteddate_from, #suggesteddate_to" ).datepicker({
+        changeMonth: true,
+        numberOfMonths: 1,
+        onSelect: function( selectedDate ) {
+            var option = this.id == "suggesteddate_from" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" );
+                date = $.datepicker.parseDate(
+                    instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                    selectedDate, instance.settings );
+            dates.not( this ).datepicker( "option", option, date );
+        }
+    });
+    var datesMD = $( "#manageddate_from, #manageddate_to" ).datepicker({
+        changeMonth: true,
+        numberOfMonths: 1,
+        onSelect: function( selectedDate ) {
+            var option = this.id == "manageddate_from" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" );
+                date = $.datepicker.parseDate(
+                    instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                    selectedDate, instance.settings );
+            datesMD.not( this ).datepicker( "option", option, date );
+        }
+    });
+    var datesAD = $( "#accepteddate_from, #accepteddate_to" ).datepicker({
+        changeMonth: true,
+        numberOfMonths: 1,
+        onSelect: function( selectedDate ) {
+            var option = this.id == "accepteddate_from" ? "minDate" : "maxDate",
+                instance = $( this ).data( "datepicker" );
+                date = $.datepicker.parseDate(
+                    instance.settings.dateFormat ||
+                    $.datepicker._defaults.dateFormat,
+                    selectedDate, instance.settings );
+            datesAD.not( this ).datepicker( "option", option, date );
+        }
+    });
+
+    $("form.update_suggestions").on("submit", function(e){
+        var form = this;
+        var action_delete_selected = $(this).find("input[value='delete']").is(":checked");
+        if ( action_delete_selected ) {
+            var suggestions_to_delete = $(this).find("input[name='edit_field']:checked");
+            if ( suggestions_to_delete.length == 0 ) {
+                alert(_("Please select at least one suggestion to delete"));
+                e.preventDefault();
+                return false;
+            } else if ( suggestions_to_delete.length == 1 ) {
+                if ( ! confirm(_("Bạn chắc chắn muốn xóa đề xuất mua này?")) ) {
+                    e.preventDefault();
+                    return false;
+                }
+            } else if ( suggestions_to_delete.length > 1 ) {
+                if ( ! confirm(_("Are you sure you want to delete these suggestions?")) ) {
+                    e.preventDefault();
+                    return false;
+                }
+            }
+        }
+        return true;
+    });
+});
+// ]]>
+</script>
+<style type="text/css">
+h4.local_collapse a { font-size : 80%; text-decoration: none; } fieldset.brief ol { display : none; }
+.overlay { top: 180px; left: 50%; position: absolute; margin-left: -100px; width: 200px; text-align: center; display: none; margin-top: -10px; background: #eeffd4; padding: .5em; color: #000; } .note { -moz-border-radius: 3px; border-radius:3px; background: transparent url("[% interface %]/[% theme %]/img/famfamfam/silk/comment.png") top left no-repeat; padding : 1px 3px 1px 18px; font-size : 90%; }
+</style>[% END %]
+[% IF ( op_save )  %]
+ <script type="text/javascript">
+        // <![CDATA[
+        $(document).ready(function() { calcNewsuggTotal(); });
+        // ]]>
+    </script>
+[% END %]
+<script type="text/javascript" src="[% themelang %]/js/acq.js"></script>
+</head>
+<body id="acq_suggestion" class="acq">
+[% INCLUDE 'header.inc' %]
+[% INCLUDE 'cat-search.inc' %]
+<div id="breadcrumbs">
+ <a href="/cgi-bin/koha/mainpage.pl">Trang chủ</a> &rsaquo; <a href="/cgi-bin/koha/acqui/acqui-home.pl">Phân hệ bổ sung</a> &rsaquo;
+ [% IF ( op_save ) %]
+ [% IF ( suggestionid ) %]
+ <a href="/cgi-bin/koha/suggestion/suggestion.pl">Để xuất mua</a> &rsaquo; Chỉnh sửa đề xuất mua số [% suggestionid %]
+ [% ELSE %]
+ <a href="/cgi-bin/koha/suggestion/suggestion.pl">Để xuất mua</a> &rsaquo; Tạo đề xuất mua
+ [% END %]
+ [% ELSIF ( op == 'show' ) %]
+ <a href="/cgi-bin/koha/suggestion/suggestion.pl">Để xuất mua</a> &rsaquo; Hiển thị đề xuất mua số [% suggestionid %] [% ELSE %] Quản lý đề xuất mua [% END %] </div>
+
+[% IF ( op == 'show' ) %]
+<div id="doc" class="yui-t7"> <!-- <div id="doc3" class="yui-t2"> -->
+<div id="bd">
+ <div id="yui-main">
+ <div class="yui-b">
+
+ <div id="toolbar" class="btn-toolbar">
+ <a class="btn btn-small" id="editsuggestion" href="suggestion.pl?op=edit&amp;suggestionid=[% suggestionid %]"><i class="icon-pencil"></i> Chỉnh sửa</a>
+ <a class="btn btn-small" id="deletesuggestion" href="suggestion.pl?op=delete&amp;edit_field=[% suggestionid %]"><i class="icon-remove"></i> Xóa</a>
+ </div>
+
+ <fieldset class="rows">
+ <legend>Thông tin tài liệu</legend>
+ <ol>
+ <li><span class="label">Nhan đề:</span>[% title |html %]</li>
+ <li><span class="label">Tác giả:</span>[% author |html %]</li>
+ <li><span class="label">Năm xuất bản:</span>[% copyrightdate |html %]</li>
+ <li><span class="label">Số ISBN/ ISSN:</span>[% isbn |html %]</li>
+ <li><span class="label">Nhà xuất bản:</span>[% publishercode |html %]</li>
+ <li><span class="label">Nơi xuất bản:</span>[% place |html %]</li>
+ <li><span class="label">Nhan đề bộ sưu tập:</span>[% collectiontitle |html %]</li>
+ <li><span class="label">Kiểu tài liệu:</span>
+ [% FOREACH itemtypeloo IN itemtypeloop %]
+ [% IF ( itemtypeloo.selected ) %][% itemtypeloo.description %][% END %]
+ [% END %]
+ </li>
+ [% IF ( patron_reason_loop ) %]
+ <li><span class="label">Lý do đề xuất: </span>
+ [% FOREACH patron_reason_loo IN patron_reason_loop %]
+ [% IF ( patron_reason_loo.selected ) %][% patron_reason_loo.lib %][% END %]
+ [% END %]
+ </li>
+ [% END %]
+ <li><span class="label">Ghi chú:</span>[% note |html %]</li>
+ </ol>
+ </fieldset>
+ <fieldset class="rows"> <legend>Quản lý đề xuất mua</legend>
+ <ol>
+ <li>
+ <span class="label">Trạng thái:</span>
+ [% SET status_found = 0 %]
+ [% IF ( STATUS == 'ASKED' ) %]
+ Chờ duyệt
+ [% SET status_found = 1 %]
+ [% ELSIF ( STATUS == 'ACCEPTED' ) %]
+ Được chấp nhận
+ [% SET status_found = 1 %]
+ [% ELSIF ( STATUS == 'CHECKED' ) %]
+ Đã kiểm tra
+ [% SET status_found = 1 %]
+ [% ELSIF ( STATUS == 'REJECTED' ) %]
+ Từ chối
+ [% SET status_found = 1 %]
+ [% ELSE %]
+ [% FOREACH s IN SuggestionStatuses %]
+ [% IF STATUS == s.authorised_value %]
+ [% s.lib %]
+ [% SET status_found = 1 %]
+ [% END %]
+ [% END %]
+ [% END %]
+
+ </li>
+ <li>
+ <table>
+ <thead><tr><th>&nbsp;</th><th>Thời gian</th><th>Người liên quan</th></tr></thead>
+ <tbody>
+ <tr>
+ <th><span class="label">Tạo đề xuất</span> </th>
+ <td>[% suggesteddate | $KohaDates %]</td>
+ <td>[% IF ( suggestedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% suggestedby_borrowernumber %]">[% suggestedby_surname %], [% suggestedby_firstname %]</a> [% Branches.GetName( suggestedby_branchcode ) %] ([% suggestedby_description %])[% END %]
+ </td>
+ </tr>
+ <tr>
+ <th><span class="label">Quản lý đề xuất</span> </th>
+ <td>[% manageddate | $KohaDates %]</td>
+ <td>[% IF ( managedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% managedby_borrowernumber %]">[% managedby_surname %], [% managedby_firstname %]</a> [% Branches.GetName( managedby_branchcode ) %] ([% managedby_description %])[% END %]</td>
+ </tr>
+ <tr>
+ <th><span class="label">Duyệt đề xuất</span> </th>
+ <td>[% accepteddate | $KohaDates %]</td>
+ <td>[% IF ( acceptedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% acceptedby_borrowernumber %]">[% acceptedby_surname %], [% acceptedby_firstname %]</a> [% Branches.GetName( acceptedby_branchcode ) %] ([% acceptedby_description %])[% END %]</td>
+ </tr>
+ </tbody>
+ </table></li></ol>
+ </fieldset>
+ <fieldset class="rows"> <legend>Thông tin bổ sung</legend>
+ <ol>
+ <li>
+ <span class="label">Thư viện:</span> [% branchname %]
+ </li>
+ <li>
+ <span class="label">Nguồn thanh toán:</span> [% budgetname %]
+ </li>
+ <li>
+ <span class="label">Số lượng bổ sung:</span>[% quantity %]
+ </li>
+ <li>
+ <span class="label">Đơn vị tiền tệ:</span>[% currency %]
+ </li>
+ <li>
+ <span class="label">Đơn giá:</span>[% price | $Price %]
+ </li>
+ <li>
+ <span class="label">Tổng số:</span>[% total | $Price %]
+ </li>
+ </ol>
+ </fieldset>
+
+ <fieldset class="action">
+ <a href="suggestion.pl">&lt;&lt; Quay lại đề xuất mua</a>
+ </fieldset>
+
+ </div>
+ </div>
+</div>
+[% ELSE %]
+
+[% IF ( op_save ) %]<div id="doc" class="yui-t7">[% ELSE %]<div id="doc3" class="yui-t2">[% END %]
+<div id="bd">
+ <div id="yui-main">
+ <div class="yui-b">
+[% IF ( op_save ) %]
+ <form id="add_edit" action="suggestion.pl" method="post" class="validated">
+ <input type="hidden" name="redirect" id="redirect" value="[% redirect %]" />
+ <input type="hidden" name="borrowernumber" id="borrowernumber" value="[% borrowernumber %]" />
+ [% IF ( suggestionid ) %]
+ <h1>Chỉnh sửa đề xuất mua số[% suggestionid %]</h1>
+ <input type="hidden" name="suggestionid" value="[% suggestionid %]"/>
+ [% ELSE %]
+ <h1>Tạo đề xuất mua</h1>
+ [% END %]
+ <fieldset class="rows"> <legend>Thông tin tài liệu</legend><ol>
+ <li>
+ <label for="title" class="required">Nhan đề:</label>
+ <input type="text" id="title" name="title" size="80" maxlength="255" value="[% title |html %]" required="required" class="required" />
+ <span class="required">Bắt buộc</span>
+ </li>
+ <li><label for="author">Tác giả:</label><input type="text" id="author" name="author" size="50" maxlength="80" value="[% author %]"/></li>
+ <li><label for="copyrightdate">Năm xuất bản:</label><input type="text" id="copyrightdate" name="copyrightdate" size="4" maxlength="4" value="[% copyrightdate %]" /></li>
+ <li><label for="isbn">Số ISBN/ ISSN:</label><input type="text" id="isbn" name="isbn" size="50" maxlength="80" value="[% isbn %]"/></li>
+ <li><label for="publishercode">Nhà xuất bản:</label><input type="text" id="publishercode" name="publishercode" size="50" maxlength="80" value="[% publishercode %]"/></li>
+ <li><label for="place">Nơi xuất bản:</label><input type="text" id="place" name="place" size="50" maxlength="80" value="[% place %]"/></li>
+ <li><label for="collectiontitle">Nhan đề bộ sưu tập:</label><input type="text" id="collectiontitle" name="collectiontitle" size="50" maxlength="80" value="[% collectiontitle %]"/></li>
+ <li><label for="itemtype">Kiểu tài liệu:</label>
+ <select id="itemtype" name="itemtype" >
+ [% FOREACH itemtypeloo IN itemtypeloop %]
+ [% IF ( itemtypeloo.selected ) %]<option selected="selected" value="[% itemtypeloo.itemtype %]">[% ELSE %]<option value="[% itemtypeloo.itemtype %]">[% END %]
+ [% itemtypeloo.description %]</option>
+ [% END %]
+ </select>
+ </li>
+ [% IF ( patron_reason_loop ) %]<li><label for="patronreason">Lý do đề xuất: </label><select name="patronreason" id="patronreason"><option value=""> -- Chọn lý do đề xuất -- </option>[% FOREACH patron_reason_loo IN patron_reason_loop %]
+ [% IF ( patron_reason_loo.selected ) %]<option value="[% patron_reason_loo.authorised_value %]" selected="selected">[% patron_reason_loo.lib %]</option>[% ELSE %]<option value="[% patron_reason_loo.authorised_value %]">[% patron_reason_loo.lib %]</option>[% END %]
+ [% END %]</select></li>[% END %]
+ <li><label for="note">Ghi chú:</label><textarea name="note" id="note" rows="5" cols="40">[% note %]</textarea></li>
+ </ol>
+ </fieldset>
+ <fieldset class="rows"> <legend>Quản lý đề xuất mua</legend>
+ <ol>
+ [% IF ( suggestionid ) %]
+ <li>
+ <label for="STATUS">Trạng thái:</label>
+ <select id="STATUS" name="STATUS">
+ <option value="">Không xác định</option>
+
+ [% IF (statusselected_ASKED ) %]
+ <option value="ASKED" selected="selected">Chờ duyệt</option>
+ [% ELSE %]
+ <option value="ASKED">Chờ duyệt</option>
+ [% END %]
+
+ [% IF (statusselected_ACCEPTED ) %]
+ <option value="ACCEPTED" selected="selected">Được chấp nhận</option>
+ [% ELSE %]
+ <option value="ACCEPTED">Được chấp nhận</option>
+ [% END %]
+
+ [% IF (statusselected_CHECKED ) %]
+ <option value="CHECKED" selected="selected">Đã kiểm tra</option>
+ [% ELSE %]
+ <option value="CHECKED">Đã kiểm tra</option>
+ [% END %]
+
+ [% IF ( statusselected_REJECTED ) %]
+ <option value="REJECTED" selected="selected">Bị từ chối</option>
+ [% ELSE %]
+ <option value="REJECTED">Bị từ chối</option>
+ [% END %]
+
+ [% FOREACH s IN SuggestionStatuses %]
+ [% IF s.authorised_value == selected_status %]
+ <option value="[% s.authorised_value %]" selected="selected">[% s.lib %]</option>
+ [% ELSE %]
+ <option value="[% s.authorised_value %]">[% s.lib %]</option>
+ [% END %]
+ [% END %]
+ </select>
+ </li>
+ [% END %]
+ <li><table>
+ <thead><tr><th>&nbsp;</th><th>Thời gian</th><th>Người liên quan</th></tr></thead>
+ <tbody>
+ <tr>
+ <th><label for="suggesteddate">Tạo đề xuất</label> </th>
+ <td><input type="text" id="suggesteddate" name="suggesteddate" size="10" maxlength="10" value="[% suggesteddate | $KohaDates %]"/></td>
+ <td><input type="hidden" id="suggestedby" name="suggestedby" value="[% suggestedby %]"/>[% IF ( suggestedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% suggestedby_borrowernumber %]">[% suggestedby_surname %], [% suggestedby_firstname %]</a> [% Branches.GetName( suggestedby_branchcode ) %] ([% suggestedby_description %])[% END %]
+ </td>
+ </tr>
+ <tr>
+ <th><label for="managedon">Quản lý đề xuất</label> </th>
+ <td><input type="text" id="managedon" name="manageddate" size="10" maxlength="10" value="[% manageddate | $KohaDates %]" /></td>
+ <td><input type="hidden" id="managedby" name="managedby" value="[% managedby %]"/>[% IF ( managedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% managedby_borrowernumber %]">[% managedby_surname %], [% managedby_firstname %]</a> [% Branches.GetName( managedby_branchcode ) %] ([% managedby_description %])[% END %]</td>
+ </tr>
+ <tr>
+ <th><label for="accepteddate">Duyệt đề xuất</label> </th>
+ <td><input type="text" id="accepteddate" name="accepteddate" size="10" maxlength="10" value="[% accepteddate | $KohaDates %]" /></td>
+ <td><input type="hidden" id="acceptedby" name="acceptedby" value="[% acceptedby %]"/>[% IF ( acceptedby_borrowernumber ) %]<a href="/cgi-bin/koha/members/moremember.pl?borrowernumber=[% acceptedby_borrowernumber %]">[% acceptedby_surname %], [% acceptedby_firstname %]</a> [% Branches.GetName( acceptedby_branchcode ) %] ([% acceptedby_description %])[% END %]</td>
+ </tr>
+ </tbody>
+ </table></li></ol>
+ </fieldset>
+ <fieldset class="rows"> <legend>Thông tin bổ sung</legend><ol>
+ <li><label for="branchcode">Thư viện:</label>
+ <select name="branchcode" id="branchcode">
+ <option value="">Tất cả</option>[% FOREACH branchloo IN branchloop %]
+ [% IF ( branchloo.selected ) %]<option value="[% branchloo.value %]" selected="selected">[% branchloo.branchname %]</option>[% ELSE %]<option value="[% branchloo.value %]">[% branchloo.branchname %]</option>[% END %][% END %]
+ </select>
+ </li>
+ <li><label for="budgetid">Nguồn thanh toán:</label>
+ <select name="budgetid" id="budgetid">
+ <option value="">Tất cả</option>[% FOREACH budgetsloo IN budgetsloop %]
+ [% IF ( budgetsloo.selected ) %]<option value="[% budgetsloo.budget_id %]" selected="selected">[% budgetsloo.budget_name %]</option>[% ELSE %]<option value="[% budgetsloo.budget_id %]">[% budgetsloo.budget_name %]</option>[% END %][% END %]
+ </select>
+ </li><li><label for="quantity">Số lượng bổ sung:</label>
+ <input type="text" size="10" id="quantity" name="quantity" value="[% quantity %]" onchange="calcNewsuggTotal();" />
+ </li><li><label for="currency">Đơn vị tiền tệ:</label>
+ [% FOREACH loop_currenc IN loop_currency %]
+ <input type="hidden" value="[% loop_currenc.rate %]" id="currency_rate_[% loop_currenc.currcode %]" name="currency_rate_[% loop_currenc.currcode %]" />
+ <input type="hidden" id="[% loop_currenc.currcode %]" name="[% loop_currenc.currcode %]" value="[% loop_currenc.rate %]" />
+ [% END %]
+ <select name="currency" id="currency" onchange="calcNewsuggTotal();">
+ [% FOREACH loop_currenc IN loop_currency %]
+ [% IF ( loop_currenc.selected ) %]<option value="[% loop_currenc.currcode %]" selected="selected">[% loop_currenc.currcode %]</option>[% ELSE %]<option value="[% loop_currenc.currcode %]">[% loop_currenc.currcode %]</option>[% END %][% END %]
+ </select>
+ </li><li><label for="price">Đơn giá:</label>
+ <input type="text" size="20" name="price" id="price" value="[% price %]" onchange="calcNewsuggTotal();" />
+ </li><li><label for="total">Tổng số (Dự kiến): </label>
+ <input type="text" readonly="readonly" id="total" name="total" size="10" value="[% total %]"/>
+ </li></ol>
+ </fieldset><input type="hidden" id="returnsuggested" name="returnsuggested" value="[% IF ( returnsuggestedby ) %][% returnsuggestedby %][% ELSE %]noone[% END %]"/>
+ <fieldset class="action"><input type="hidden" name="op" value="[% op %]" />[% IF ( suggestionid ) %]<input type="submit" value="Lưu" /> <a class="cancel" href="[% IF ( returnsuggestedby ) %]/cgi-bin/koha/members/moremember.pl?borrowernumber=[% returnsuggestedby %]#suggestions[% ELSE %]suggestion.pl[% END %]">Hủy bỏ</a>[% ELSE %]<input value="Gửi đề xuất mua" type="submit" /> <a class="cancel" href="suggestion.pl">Hủy bỏ</a>[% END %]
+ </fieldset>
+ </form>
+[% END %]
+
+[% IF ( op_else ) %]
+<div id="toolbar" class="btn-toolbar">
+ <a class="btn btn-small" id="newsuggestion" href="suggestion.pl?op=add"><i class="icon-plus"></i> Tạo đề xuất mua</a>
+</div>
+
+<h1>Quản lý đề xuất mua</h1>
+
+[% UNLESS ( notabs ) %]
+ <div id="suggestiontabs" class="toptabs">
+ <ul class="ui-tabs-nav">
+ [% FOREACH suggestion IN suggestions %]
+ <li>
+ <a href="#[% suggestion.suggestiontype %]">
+ [% IF ( suggestion.suggestiontypelabel ) %]
+ [% IF (suggestion.suggestiontypelabel == "Pending") %]Chờ duyệt
+ [% ELSIF (suggestion.suggestiontypelabel == "Accepted") %]Được chấp nhận
+ [% ELSIF (suggestion.suggestiontypelabel == "Checked") %]Đã kiểm tra
+ [% ELSIF (suggestion.suggestiontypelabel == "Rejected") %]Từ chối
+ [% ELSIF (suggestion.suggestiontypelabel == "Available") %]Sẵn sàng
+ [% ELSIF (suggestion.suggestiontypelabel == "Ordered") %]Được đặt mua
+ [% ELSE %][% suggestion.suggestiontypelabel %][% END %]
+ [% ELSE %]
+ [% IF ( suggestion.suggestiontype ) %]
+ [% AuthorisedValues.GetByCode( 'SUGGEST_STATUS', suggestion.suggestiontype ) %]
+ [% ELSE %]
+ Không xác định
+ [% END %]
+ [% END %]
+ ([% suggestion.suggestions_loop.size %])</a></li>
+
+ [% END %]
+ </ul>
+[% END %]
+
+[% FOREACH suggestion IN suggestions %]
+<div id="[% suggestion.suggestiontype %]">
+<form class="update_suggestions" name="f[% suggestion.suggestiontype %]" method="post" action="/cgi-bin/koha/suggestion/suggestion.pl#[% suggestion.suggestiontype %]">
+
+[% IF ( suggestion.suggestions_loop ) %]
+<p><a id="CheckAll[% suggestion.suggestiontype %]" href="#">Chọn tất cả</a> | <a id="UncheckAll[% suggestion.suggestiontype %]" href="#">Bỏ tất cả</a></p>
+ <table id="[% suggestion.suggestiontype %]t" class="sorted">
+ <thead>
+ <tr><th>&nbsp;</th>
+ <th class="anti-the">Đề xuất mua</th>
+ <th>Người đề xuất</th>
+ <th>Người quản lý</th>
+ <th>Thư viện</th>
+ <th>Quỹ thanh toán</th>
+ <th>Trạng thái</th></tr>
+ </thead>
+ <tbody>
+ [% FOREACH suggestions_loo IN suggestion.suggestions_loop %]
+ [% IF ( suggestions_loo.even ) %]<tr class="highlight">[% ELSE %]<tr>[% END %]
+ <td>
+ <input type="checkbox" name="edit_field" value="[% suggestions_loo.suggestionid %]" />
+ </td>
+ <td>
+ <a href="suggestion.pl?suggestionid=[% suggestions_loo.suggestionid %]&op=show" title="Đề xuất mua">
+ [% suggestions_loo.title |html %][% IF ( suggestions_loo.author ) %], Tác giả: [% suggestions_loo.author %][% END %]</a>
+ [<a title="Đề xuất mua" href="suggestion.pl?suggestionid=[% suggestions_loo.suggestionid %]&op=edit">Chỉnh sửa</a>]
+ <br />
+ [% IF ( suggestions_loo.copyrightdate ) %]&copy; [% suggestions_loo.copyrightdate |html %] [% END %] [% IF ( suggestions_loo.volumedesc ) %];Tập:<i>[% suggestions_loo.volumedesc |html %]</i> [% END %] [% IF ( suggestions_loo.isbn ) %]; Số ISBN:<i>[% suggestions_loo.isbn |html %]</i> [% END %][% IF ( suggestions_loo.publishercode ) %]; Nhà xuất bản: [% suggestions_loo.publishercode |html %] [% END %][% IF ( suggestions_loo.publicationyear ) %] Năm xuất bản: <i>[% suggestions_loo.publicationyear |html %]</i> [% END %][% IF ( suggestions_loo.place ) %] Nơi xuất bản: <i>[% suggestions_loo.place |html %]</i> [% END %][% IF ( suggestions_loo.collectiontitle ) %]; [% suggestions_loo.collectiontitle |html %] [% END %][% IF ( suggestions_loo.itemtype ) %]; [% suggestions_loo.itemtype |html %] [% END %]<br />[% IF ( suggestions_loo.note ) %]<span class="note">Ghi chú (Liên hệ):[% suggestions_loo.note |html%]</span>[% END %]
+ </td>
+ <td>
+ [% IF ( suggestions_loo.emailsuggestedby ) %]<a href="mailto:[% suggestions_loo.emailsuggestedby %]">[% END %][% suggestions_loo.surnamesuggestedby %][% IF ( suggestions_loo.firstnamesuggestedby ) %], [% suggestions_loo.firstnamesuggestedby %][% END %] [% IF ( suggestions_loo.emailsuggestedby ) %]</a>[% END %]
+ [% IF ( suggestions_loo.suggesteddate ) %] - [% suggestions_loo.suggesteddate | $KohaDates %][% END %]
+ </td>
+ <td>
+ [% IF ( suggestions_loo.emailmanagedby ) %]<a href="mailto:[% suggestions_loo.emailmanagedby %]">[% END %][% suggestions_loo.surnamemanagedby %][% IF ( suggestions_loo.firstnamemanagedby ) %], [% suggestions_loo.firstnamemanagedby %][% END %] [% IF ( suggestions_loo.emailmanagedby ) %]</a>[% END %]
+ [% IF ( suggestions_loo.manageddate ) %] - [% suggestions_loo.manageddate | $KohaDates %][% END %]
+ </td>
+ <td>
+ [% Branches.GetName( suggestions_loo.branchcode ) %]
+ </td>
+ <td>
+ [% suggestions_loo.budget_name %]
+ </td>
+ <td>
+ [% IF ( suggestions_loo.ASKED ) %]
+ Chờ duyệt
+ [% ELSIF ( suggestions_loo.ACCEPTED ) %]
+ Được chấp nhận
+ [% ELSIF ( suggestions_loo.ORDERED ) %]
+ Được đặt mua
+ [% ELSIF ( suggestions_loo.REJECTED ) %]
+ Từ chối
+ [% ELSIF ( suggestions_loo.CHECKED ) %]
+ Đã kiểm tra
+ [% ELSIF AuthorisedValues.GetByCode( 'SUGGEST_STATUS', suggestions_loo.STATUS ) %]
+ [% AuthorisedValues.GetByCode( 'SUGGEST_STATUS', suggestions_loo.STATUS ) %]
+ [% END %]
+
+ [% IF ( suggestions_loo.reason ) %]
+ <br />([% suggestions_loo.reason %])
+ [% END %]
+ </td>
+ </tr>
+ [% END %]</tbody>
+ </table> <fieldset>
+ <div id="select-reason[% suggestion.suggestiontype %]">
+ <div id="status[% suggestion.suggestiontype %]">
+ <label for="STATUS[% suggestion.suggestiontype %]">Thay đổi trạng thái (Chọn đề xuất mua trước): </label>
+ <select name="STATUS" id="STATUS[% suggestion.suggestiontype %]">
+ <option value=""> -- Chọn trạng thái đề xuất mua --</option>
+
+ [% IF (statusselected_ASKED ) %]
+ <option value="ASKED" selected="selected">Chờ duyệt</option>
+ [% ELSE %]
+ <option value="ASKED">Chờ duyệt</option>
+ [% END %]
+
+ [% IF (statusselected_ACCEPTED ) %]
+ <option value="ACCEPTED" selected="selected">Được chấp nhận</option>
+ [% ELSE %]
+ <option value="ACCEPTED">Được chấp nhận</option>
+ [% END %]
+
+ [% IF (statusselected_CHECKED ) %]
+ <option value="CHECKED" selected="selected">Đã kiểm tra</option>
+ [% ELSE %]
+ <option value="CHECKED">Đã kiểm tra</option>
+ [% END %]
+
+ [% IF ( statusselected_REJECTED ) %]
+ <option value="REJECTED" selected="selected">Bị từ chối</option>
+ [% ELSE %]
+ <option value="REJECTED">Bị từ chối</option>
+ [% END %]
+
+ [% FOREACH s IN SuggestionStatuses %]
+ <option value="[% s.authorised_value %]">[% s.lib %]</option>
+ [% END %]
+ </select>
+
+ <label for="reason[% suggestion.suggestiontype %]">với lí do sau đây:</label>
+ <select id="reason[% suggestion.suggestiontype %]" name="reason[% suggestion.suggestiontype %]">
+ <option value=""> -- Chọn một lý do của bạn -- </option>
+ [% FOREACH reasonsloo IN suggestion.reasonsloop %]
+ <option value="[% reasonsloo.lib %]">[% reasonsloo.lib %]</option>
+ [% END %]
+ <option value="other">Lý do khác ...</option>
+ </select>
+
+ <span id="other_reason[% suggestion.suggestiontype %]">
+ <input placeholder="Vui lòng cho biết lý do của bạn..." size="31" name="other_reason[% suggestion.suggestiontype %]" id="select-other_reason[% suggestion.suggestiontype %]" type="text" />
+ <a href="#back[% suggestion.suggestiontype %]">Hủy bỏ</a>
+ </span>
+
+ <strong style="padding: 0 1em;">Hoặc:</strong>
+
+ <label for="[% suggestion.suggestiontype %]delete">Xóa đề xuất mua</label>
+ <input type="checkbox" name="op" id="[% suggestion.suggestiontype %]delete" />
+ </div>
+ </div>
+
+
+ <input type="hidden" name="tabcode" value="[% suggestion.suggestiontype %]" />
+ <input type="hidden" name="op" value="change" />
+</fieldset>
+ <fieldset class="action">
+ <input value="Cập nhật" type="submit" /></fieldset>
+</form>
+[% ELSE %]
+ <b>Không có đề xuất mua trong danh sách hiện tại.</b>
+[% END %]
+</div>
+[% END %]
+ </div>
+[% END %]
+</div>
+</div>
+
+ [% UNLESS ( op_save ) %] [% UNLESS ( op == 'show' ) %]<div class="yui-b">
+<form name="suggestionfilter" action="suggestion.pl" method="get">
+<fieldset class="brief"><ol style="display:block;"><li><label for="displayby">Sắp xếp đề xuất mua theo: </label>
+ <select name="displayby" id="displayby" style="width:auto;">
+ [% IF ( displayby == "STATUS" ) %]
+ <option value="STATUS" selected="selected">Trạng thái</option>
+ [% ELSE %]
+ <option value="STATUS">Trạng thái</option>
+ [% END %]
+ [% IF ( displayby == "branchcode" ) %]
+ <option value="branchcode" selected="selected">Thư viện</option>
+ [% ELSE %]
+ <option value="branchcode">Thư viện</option>
+ [% END %]
+ [% IF ( displayby == "itemtype" ) %]
+ <option value="itemtype" selected="selected">Kiểu tài liệu</option>
+ [% ELSE %]
+ <option value="itemtype">Kiểu tài liệu</option>
+ [% END %]
+ [% IF ( displayby == "managedby" ) %]
+ <option value="managedby" selected="selected">Người quản lý</option>
+ [% ELSE %]
+ <option value="managedby">Người quản lý</option>
+ [% END %]
+ [% IF ( displayby == "acceptedby" ) %]
+ <option value="acceptedby" selected="selected">Người duyệt</option>
+ [% ELSE %]
+ <option value="acceptedby">Người duyệt</option>
+ [% END %]
+ </select> <input type="submit" value="Sắp xếp" /></li></ol></fieldset>
+<h4>Bộ lọc dữ liệu: <a style="font-size:80%;font-weight:normal;" href="/cgi-bin/koha/suggestion/suggestion.pl">[Xóa]</a></h4>
+ <div style="display:block;" id="limits">
+
+ <fieldset class="brief"><h4 class="local_collapse"><a href="#">Thông tin tài liệu</a></h4>
+ <ol> <li><label for="title"> Nhan đề:</label><input type="text" id="title" name="title" value="[% title |html %]" /></li>
+ <li><label for="author"> Tác giả:</label><input type="text" id="author" name="author" value="[% author %]" /></li>
+ <li><label for="isbn"> Số ISBN:</label><input type="text" id="isbn"  name="isbn" value="[% isbn %]" /></li>
+ <li><label for="publishercode"> Nhà xuất bản:</label><input type="text" id="publishercode" name="publishercode" value="[% publishercode %]" /></li>
+ <li><label for="copyrightdate_filter"> Năm xuất bản:</label><input type="text" id="copyrightdate_filter" name="copyrightdate" value="[% copyrightdate %]" /></li>
+ <li><label for="collectiontitle"> Nhan đề bộ sưu tập:</label><input type="text" id="collectiontitle" name="collectiontitle" value="[% collectiontitle %]" /></li><li><input type="submit" value="Tìm kiếm" /></li></ol>
+ </fieldset>
+ <fieldset class="brief"><h4 class="local_collapse"><a href="#">Thông tin đề xuất mua</a></h4>
+ <ol>
+ <li>
+ <label for="STATUS"> Trạng thái:</label>
+ <select name="STATUS" id="STATUS">
+ <option value="">Tất cả</option>
+
+ [% IF (statusselected_ASKED ) %]
+ <option value="ASKED" selected="selected">Chờ duyệt</option>
+ [% ELSE %]
+ <option value="ASKED">Chờ duyệt</option>
+ [% END %]
+
+ [% IF (statusselected_ACCEPTED ) %]
+ <option value="ACCEPTED" selected="selected">Được chấp nhận</option>
+ [% ELSE %]
+ <option value="ACCEPTED">Được chấp nhận</option>
+ [% END %]
+
+ [% IF (statusselected_CHECKED ) %]
+ <option value="CHECKED" selected="selected">Đã kiểm tra</option>
+ [% ELSE %]
+ <option value="CHECKED">Đã kiểm tra</option>
+ [% END %]
+
+ [% IF ( statusselected_REJECTED ) %]
+ <option value="REJECTED" selected="selected">Bị từ chối</option>
+ [% ELSE %]
+ <option value="REJECTED">Bị từ chối</option>
+ [% END %]
+
+ [% FOREACH s IN SuggestionStatuses %]
+ [% IF s.authorised_value == selected_status %]
+ <option value="[% s.authorised_value %]" selected="selected">[% s.lib %]</option>
+ [% ELSE %]
+ <option value="[% s.authorised_value %]">[% s.lib %]</option>
+ [% END %]
+ [% END %]
+ </select>
+ </li>
+
+ <li><label for="suggestedby"> Người đề xuất:</label><select id="suggestedby" name="suggestedby"><option value="">Tất cả</option>
+[% FOREACH suggestedby_loo IN suggestedby_loop %][% IF ( suggestedby_loo.selected ) %]<option value="[% suggestedby_loo.code %]" selected="selected">[% suggestedby_loo.desc %]</option>[% ELSE %]<option value="[% suggestedby_loo.code %]">[% suggestedby_loo.desc %]</option>[% END %][% END %]
+ </select></li>
+ <li>
+ <label for="suggesteddate_from">Ngày đề xuất:</label>
+ <input type="text" id="suggesteddate_from" size="10" name="suggesteddate_from" value="[% suggesteddate_from %]" />
+ </li>
+ <li>
+ <label for="suggesteddate_to">Đến:</label>
+ <input type="text" id="suggesteddate_to" size="10" name="suggesteddate_to" value="[% suggesteddate_to %]" />
+ </li>
+ <li><label for="managedby"> Người quản lý:</label><select id="managedby" name="managedby"><option value="">Tất cả</option>
+[% FOREACH managedby_loo IN managedby_loop %][% IF ( managedby_loo.selected ) %]<option value="[% managedby_loo.code %]" selected="selected">[% managedby_loo.desc %]</option>[% ELSE %]<option value="[% managedby_loo.code %]">[% managedby_loo.desc %]</option>[% END %][% END %]
+ </select></li>
+ <li>
+ <label for="manageddate_from">Ngày kiểm tra:</label>
+ <input type="text" id="manageddate_from" size="10" name="manageddate_from" value="[% manageddate_from %]" />
+ </li>
+ <li>
+ <label for="manageddate_to">Đến:</label>
+ <input type="text" id="manageddate_to" size="10" name="manageddate_to" value="[% manageddate_to %]" />
+ </li>
+ <li><label for="acceptedby"> Người duyệt:</label><select id="acceptedby" name="acceptedby"><option value="">Tất cả</option>
+[% FOREACH acceptedby_loo IN acceptedby_loop %][% IF ( acceptedby_loo.selected ) %] <option value="[% acceptedby_loo.code %]" selected="selected">[% acceptedby_loo.desc %]</option>[% ELSE %]<option value="[% acceptedby_loo.code %]">[% acceptedby_loo.desc %]</option>[% END %][% END %]
+ </select></li>
+ <li>
+ <label for="accepteddate_from">Ngày duyệt:</label>
+ <input type="text" id="accepteddate_from" size="10" name="accepteddate_from" value="[% accepteddate_from %]" />
+ </li>
+ <li>
+ <label for="accepteddate_to">Đến:</label>
+ <input type="text" id="accepteddate_to" size="10" name="accepteddate_to" value="[% accepteddate_to %]" />
+ </li>
+ <li><input value="Tìm kiếm" type="submit" /></li></ol>
+ </fieldset>
+
+ <fieldset class="brief"><h4 class="local_collapse"><a href="#">Thông tin bổ sung</a></h4>
+ <ol><li><label for="budgetid"> Nguồn thanh toán:</label>
+ <select name="budgetid" id="budgetid">
+ <option value="__ANY__">Tất cả</option>
+ [% IF budgetid == '__NONE__' %]
+ <option value="__NONE__" selected="selected">Không</option>
+ [% ELSE %]
+ <option value="__NONE__">Không</option>
+ [% END %]
+ [% FOREACH budgetid_loo IN budgetid_loop %]
+ [% IF ( budgetid_loo.selected ) %] <option value="[% budgetid_loo.code %]" selected="selected">[% budgetid_loo.desc %]</option>[% ELSE %]<option value="[% budgetid_loo.code %]">[% budgetid_loo.desc %]</option>[% END %]
+ [% END %]
+ </select></li>
+ <li><label for="branchcode"> Thư viện bổ sung:</label>
+ <select name="branchcode" id="branchcode">
+ <option value="__ANY__">Tất cả</option>[% FOREACH branchloo IN branchloop %]
+ [% IF ( branchloo.selected ) %] <option value="[% branchloo.value %]" selected="selected">[% branchloo.branchname %]</option>[% ELSE %] <option value="[% branchloo.value %]">[% branchloo.branchname %]</option>[% END %]
+ [% END %]
+ </select></li><li><input type="submit" value="Tìm kiếm" /></li></ol>
+ </fieldset>
+ </div>
+ </form>
+ </div>
+ [% END %]
+ [% END %]
+</div>
+[% END %]
+[% INCLUDE 'intranet-bottom.inc' %]
+

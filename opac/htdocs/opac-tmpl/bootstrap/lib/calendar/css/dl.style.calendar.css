@@ -1,0 +1,60 @@
+/*Edit by huythuan.vo@dlcorp.com.vn*/
+
+#eventCalendarHumanDate{
+	border-radius: 0px;
+	box-shadow: none;
+	border:0px;
+	padding-top:10px;
+}
+
+.eventsCalendar-monthWrap{
+	top:0px;
+}
+.eventsCalendar-currentTitle{
+	background:#1876cc;
+	margin-top:60px;
+}
+.eventsCalendar-daysList{
+	border: 0px !important;
+	border-radius: 0px !important;
+	margin:0px !important;
+}
+
+.eventCalendar-wrap .arrow{
+
+}
+
+.eventsCalendar-monthWrap{
+	position:static;
+}
+
+.eventsCalendar-noEvents{
+	border-radius:0px  !important;
+	margin:0px  !important;
+	box-shadow:0px  !important;
+}
+
+.monthTitle{
+	text-transform: uppercase;
+}
+
+.meeting p{
+	display:none;
+}
+
+.eventsCalendar-list-wrap{
+	background:#ececec;
+
+}
+
+@media (max-width: 767px){
+	
+}
+
+.eventsCalendar-list-wrap{
+	min-height:40px;
+}
+.eventsCalendar-list-content.scrollable{
+	height:auto;
+	max-height:50px;
+}

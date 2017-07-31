@@ -1,0 +1,401 @@
+[% USE Koha %]
+[% INCLUDE 'doc-head-open.inc' %]
+[% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]
+ &rsaquo; Tìm kiếm nâng cao
+[% INCLUDE 'doc-head-close.inc' %]
+[% BLOCK cssinclude %][% END %]
+</head>
+[% INCLUDE 'bodytag.inc' bodyid='advsearch' bodyclass='scrollto' %]
+[% INCLUDE 'masthead.inc' %]
+<form action="/cgi-bin/koha/opac-search.pl" method="get">
+ <div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a> <span class="divider">&rsaquo;</span></li>
+ <li><a href="/cgi-bin/koha/opac-search.pl">Tìm kiếm nâng cao</a></li>
+ </ul>
+
+ <div class="container-fluid">
+ <div class="row-fluid">
+ <div class="span12">
+ <!-- BOOLEAN SEARCH OPTIONS -->
+ <div id="booleansearch" class="maincontent">
+ <fieldset>
+ <legend>Tìm kiếm:</legend>
+ [% FOREACH search_box IN search_boxes_loop %]
+ <p>
+ [% IF ( expanded_options ) %]
+ [% IF ( search_box.boolean ) %]
+ <select name="op">
+ <option value="and" selected="selected">và</option>
+ <option value="or">hoặc </option>
+ <option value="not">không</option>
+ </select>
+ [% END %]
+ [% ELSE %]
+ <label for="search-field_[% loop.index %]">
+ [% IF loop.index == 0 %]
+ &nbsp;&nbsp;&nbsp;&nbsp;
+ 
+ [% ELSE %]
+ và
+ [% END %]
+ </label>
+ [% END %]
+ [% IF ( expanded_options ) %][% left_content %][% END %]
+ <select name="idx" id="search-field_[% loop.index %]">
+ <option value="kw">Từ khóa bất kỳ</option>
+ <option value="su,wrdl">Chủ đề</option>
+ [% IF ( expanded_options ) %]
+ <option value="su,phr">&nbsp;&nbsp;&nbsp;&nbsp; Cụm từ chủ đề</option>
+ <option value="su-br">&nbsp;&nbsp;&nbsp;&nbsp; Chủ đề và điều kiện rộng hơn</option>
+ <option value="su-na">&nbsp;&nbsp;&nbsp;&nbsp; Chủ đề và điều kiện hẹp hơn</option>
+ <option value="su-rl">&nbsp;&nbsp;&nbsp;&nbsp; Chủ đề và điều kiện liên quan</option>
+ [% END %]
+ <option value="ti">Nhan đề</option>
+ [% IF ( expanded_options ) %]
+ <option value="ti,phr">&nbsp;&nbsp;&nbsp;&nbsp; Cụm từ nhan đề</option>
+ <option value="se,wrdl">Nhan đề ÂPĐK</option>
+ [% IF ( numbersphr) %]
+ <option value="callnum,phr">Ký hiệu phân loại</option>
+ [% ELSE %]
+ <option value="callnum">Ký hiệu phân loại</option>
+ [% END %]
+ <option value="location">Kho tài liệu</option>
+ [% END %]
+ <option value="au,wrdl">Tác giả</option>
+ [% IF ( expanded_options ) %]
+ <option value="au,phr">&nbsp;&nbsp;&nbsp;&nbsp; Cụm từ tác giả</option>
+ <option value="cpn,wrdl">&nbsp;&nbsp;&nbsp;&nbsp; Tên tổ chức</option>
+ <option value="cfn,wrdl">&nbsp;&nbsp;&nbsp;&nbsp; Tên hội nghị</option>
+ <option value="cfn,phr">&nbsp;&nbsp;&nbsp;&nbsp; Cụm từ tên hội nghị</option>
+ <option value="pn,wrdl">&nbsp;&nbsp;&nbsp;&nbsp; Tên cá nhân</option>
+ <option value="pn,phr">&nbsp;&nbsp;&nbsp;&nbsp; Cụm từ tên cá nhân</option>
+ [% END %]
+ [% IF ( expanded_options ) %]
+ <option value="nt">Ghi chú/ Bình luận</option>
+ [% IF (marcflavour != 'UNIMARC') %]
+ <option value="curriculum">Chương trình đào tạo</option>
+ [% END %]
+ [% END %]
+ <option value="pb,wrdl">Nhà xuất bản</option>
+ <option value="pl,wrdl">Nơi xuất bản</option>
+ [% IF ( expanded_options ) %]
+ [% IF ( numbersphr) %]
+ <option value="sn,phr">Số chuẩn</option>
+ [% ELSE %]
+ <option value="sn">Số chuẩn</option>
+ [% END %]
+ <option value="nb">&nbsp;&nbsp;&nbsp;&nbsp; Số ISBN</option>
+ <option value="ns">&nbsp;&nbsp;&nbsp;&nbsp; Số ISSN</option>
+ [% ELSE %]
+ <option value="nb">Số ISBN</option>
+ [% END %]
+ <option value="bc">Đăng ký cá biệt</option>
+ </select>
+ <input name="q" value="" size="30" title="Nhập thuật ngữ tìm kiếm" type="text" />
+ [% IF ( expanded_options ) %]
+ [% IF ( !loop.first ) %]
+ <a class="ButtonPlus" title="Thêm trường tìm kiếm" href="#" name="ButtonPlus">[+]</a>
+ <a class="ButtonLess" title="Loại bỏ trường tìm kiếm" href="#">[-]</a>
+ [% END %]
+ [% END %]
+ </p>
+ [% END # FOREACH search_box %]
+ </fieldset>
+ </div> <!-- /BOOLEAN SEARCH OPTIONS -->
+ </div> <!-- / .span12 -->
+ </div> <!-- / .row-fluid -->
+ <div class="text-center">
+ <!-- SEARCH BUTTONS -->
+ [% PROCESS searchbuttons %]
+ <!-- /SEARCH BUTTONS -->
+ </div>
+
+ <div class="row-fluid">
+ [% IF ( ( OpacAdvSearchOptions.grep('itemtype').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('itemtype').size > 0 and expanded_options ) ) %]
+ <div class="span12">
+ <div id="advsearches" class="toptabs">
+ <ul>
+ [% FOREACH advsearchloo IN advancedsearchesloop %]
+ <li id="advsearch-tab-[% advsearchloo.advanced_search_type %]">
+ <a href="#advsearch-[% advsearchloo.advanced_search_type %]">
+ [% IF ( advsearchloo.advanced_search_type == 'itemtypes' ) %]Kiểu tài liệu
+ [% ELSIF ( advsearchloo.advanced_search_type == 'ccode' ) %]Bộ sưu tập
+ [% ELSIF ( advsearchloo.advanced_search_type == 'loc' ) %]Kho tài liệu
+ [% ELSE %]Thông tin khác
+ [% END %]
+ </a></li>
+ [% END %]
+ </ul>
+
+ [% FOREACH advsearchloo IN advancedsearchesloop %]
+ <div id="advsearch-[% advsearchloo.advanced_search_type %]" class="advsearch">
+ <fieldset>
+ <legend>Giới hạn trong các dạng tài liệu sau đây:</legend>
+ <div class="row-fluid">
+ [% FOREACH itemtypeloo IN advsearchloo.code_loop %]
+ <div class="span3"><input type="checkbox" id="[% itemtypeloo.ccl FILTER remove(',') %]-[% itemtypeloo.number %]" name="limit" value="mc-[% itemtypeloo.ccl %]:[% itemtypeloo.code %]"/><label for="[% itemtypeloo.ccl FILTER remove(',') %]-[% itemtypeloo.number %]">[% UNLESS ( noItemTypeImages ) %][% IF ( itemtypeloo.imageurl ) %]<img src="[% itemtypeloo.imageurl %]" alt="[% itemtypeloo.description %]" />[% END %]&nbsp;[% END %]
+ [% itemtypeloo.description %]</label></div>
+ [% IF ( loop.last ) %]</div>[% ELSE %][% UNLESS ( loop.count % 4 ) %]</div><div class="row-fluid">[% END %][% END %]
+ [% END %]
+ </fieldset>
+ </div> <!-- / #advsearch-[% advsearchloo.advanced_search_type %] -->
+ [% END # / FOREACH advancedsearchesloop %]
+ </div> <!-- / #advsearches -->
+ </div> <!-- / .span12 -->
+ [% END %]
+
+ <div class="row-fluid">
+ [% IF ( ( OpacAdvSearchOptions.grep('pubdate').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('pubdate').size > 0 and expanded_options ) ) %]
+ <div class="span3">
+ <div id="pubrange">
+ <!-- PUB RANGE OPTION -->
+ <fieldset>
+ <legend>Giới hạn thời gian xuất bản:</legend>
+ <label for="limit-yr">Giới hạn thời gian:</label>
+ <input size="30" id="limit-yr" title="Nhập thuật ngữ tìm kiếm" type="text" name="limit-yr" value="" />
+ <p>Ví dụ: 1999-2001. Bạn cũng có thể sử dụng "<1987" để tìm kiếm các tài liệu được xuất bản từ năm 1987 trở về trước hoặc "2008>" để tìm kiếm các tài liệu xuất bản từ năm 2008 trở về sau.</p>
+ </fieldset>
+ <!-- /PUB RANGE OPTION -->
+ </div>
+ </div>
+ [% END %]
+
+ [% IF ( ( OpacAdvSearchOptions.grep('language').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('language').size > 0 and expanded_options ) ) %]
+ <div class="span3">
+ <div id="langfilter">
+ <fieldset>
+ <legend>Giới hạn ngôn ngữ</legend>
+ <!-- LANGUAGE LIMIT -->
+ <p>
+ <label for="language-limit">Ngôn ngữ: </label>
+ <select id="language-limit" name="limit">
+ <option value="">Tất cả</option>
+ [% FOREACH search_languages_loo IN search_languages_loop %]
+ [% IF ( search_languages_loo.selected ) %]
+ <option value="ln,rtrn:[% search_languages_loo.iso639_2_code %]" selected="selected">[% search_languages_loo.language_description %]</option>
+ [% ELSE %]
+ <option value="ln,rtrn:[% search_languages_loo.iso639_2_code %]">[% search_languages_loo.language_description %]</option>
+ [% END %]
+ [% END %]
+ </select>
+ </p>
+ <!-- /LANGUAGE LIMIT -->
+ </fieldset>
+ </div> <!-- / #langfilter -->
+ </div> <!-- / .span3 -->
+ [% END %]
+
+ [% IF ( ( OpacAdvSearchOptions.grep('location').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('location').size > 0 and expanded_options ) ) %]
+ [% UNLESS ( singleBranchMode ) %]
+ <div class="span3">
+ <!-- AVAILABILITY LIMITS -->
+ <div id="location">
+ <fieldset>
+ <legend>Giới hạn thư viện và trạng thái tài liệu: </legend>
+ <label for="branchloop">Thư viện:</label>
+ <select name="limit" id="branchloop">
+ <option value="">Tất cả</option>
+ [% FOREACH BranchesLoo IN BranchesLoop %]
+ [% IF ( BranchesLoo.selected ) %]
+ <option value="branch:[% BranchesLoo.value %]" selected="selected">[% BranchesLoo.branchname %]</option>
+ [% ELSE %]
+ <option value="branch:[% BranchesLoo.value %]">[% BranchesLoo.branchname %]</option>
+ [% END %]
+ [% END %]
+ </select>
+ [% IF ( searchdomainloop ) %]
+ <p>hoặc </p>
+ <label for="categoryloop">Nhóm thư viện</label>
+ <select name="multibranchlimit" id="categoryloop">
+ <option value=""> -- Không -- </option>
+ [% FOREACH searchdomainloo IN searchdomainloop %]
+ <option value="[% searchdomainloo.categorycode %]">[% searchdomainloo.categoryname %]</option>
+ [% END %]
+ </select>
+ [% END %]
+ <div style="margin-top:.4em">
+ <label for="available-items"><input type="checkbox" id="available-items" name="limit" value="available" /> Chỉ tìm kiếm các tài liệu sẵn sàng cho bạn đọc mượn</label>
+ </div>
+ </fieldset>
+ </div> <!-- / #location -->
+ <!-- /AVAILABILITY LIMITS -->
+ </div> <!-- / .span3 -->
+ [% END # / UNLESS singleBranchMode %]
+ [% END %]
+
+ [% IF ( ( OpacAdvSearchOptions.grep('sorting').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('sorting').size > 0 and expanded_options ) ) %]
+ <div class="span3">
+ <!-- RANK LIMITS -->
+ <div id="sortby">
+ <fieldset>
+ <legend>Sắp xếp kết quả tìm kiếm: </legend>
+ <label for="sort_by">Sắp xếp theo:</label>
+ <select id="sort_by" name="sort_by">
+ [% INCLUDE 'resort_form.inc' %]
+ </select>
+ </fieldset>
+ </div>
+ <!-- RANK LIMITS -->
+ </div> <!-- / .span3 -->
+ [% END %]
+ </div> <!-- / .row-fluid -->
+
+ [% IF ( ( OpacAdvSearchOptions.grep('subtype').size > 0 and not expanded_options ) or ( OpacAdvSearchMoreOptions.grep('subtype').size > 0 and expanded_options ) ) %]
+ <div class="row-fluid">
+ [% IF ( usmarc ) %]
+ <!-- SUBTYPE LIMITS -->
+ <div id="subtypes">
+ <div class="span3">
+ <fieldset>
+ <legend>Đối tượng bạn đọc</legend>
+ <select name="limit" class="subtype">
+ <option value="" selected="selected" class="menuheader">Tất cả bạn đọc</option>
+ <option value="aud:a">Mầm non</option>
+ <option value="aud:b">Tiểu học</option>
+ <option value="aud:c">Thiếu niên</option>
+ <option value="aud:d">Thanh niên</option>
+ <option value="aud:e">Người lớn</option>
+ <option value="aud:f">Chuyên ngành</option>
+ <option value="aud:g">Tổng hợp</option>
+ <option value="aud:j">Sách thiếu nhi</option>
+ </select>
+ </fieldset>
+ </div> <!-- / .span3 -->
+
+ <div class="span3">
+ <fieldset>
+ <legend>Phân loại nội dung</legend>
+ <select name="limit" class="subtype">
+ <option value="" selected="selected" class="menuheader">Tất cả nội dung</option>
+ <option value="fic:1">Viễn tưởng</option>
+ <option value="fic:0">Khoa học </option>
+ <option value="bio:b">Biên mục</option>
+ <option value="mus:j">Bản thu âm</option>
+ <option value="mus:i">Không phải bản thu âm</option>
+ </select>
+ </fieldset>
+ </div>
+
+ <div class="span3">
+ <fieldset>
+ <legend>Định dạng</legend>
+ <select name="limit" class="subtype">
+ <option value="" selected="selected" class="menuheader">Tất cả định dạng</option>
+ <option value="l-format:ta">Sách in khổ thường</option>
+ <option value="l-format:tb">Sách in khổ lớn</option>
+ <option value="l-format:fk">Chữ nổi</option>
+ <option value="">-----------</option>
+ <option value="l-format:sd">CD audio</option>
+ <option value="l-format:ss">Băng Cassette</option>
+ <option value="l-format:vf">Băng VHS</option>
+ <option value="l-format:vd">Đĩa DVD</option>
+ <option value="l-format:co">CD Phần mềm</option>
+ <option value="l-format:cr">Website</option>
+ </select>
+ </fieldset>
+ </div> <!-- / .span3 -->
+
+ <div class="span3">
+ <fieldset>
+ <legend>Các kiểu nội dung tài liệu/ chất liệu in</legend>
+ <select name="limit" class="subtype">
+ <option value="">Tất cả</option>
+ <option value="ctype:a">Tóm tắt/ Tổng quát:</option>
+ <option value="ctype:b">Thư mục</option>
+ <option value="ctype:c">Mục lục</option>
+ <option value="ctype:d">Từ điển</option>
+ <option value="ctype:e">Bách khoa toàn thư </option>
+ <option value="ctype:f">Sổ tay</option>
+ <option value="ctype:g">Bài viết pháp luật</option>
+ <option value="ctype:i">Chỉ dẫn</option>
+ <option value="ctype:j">Tài liệu sáng chế</option>
+ <option value="ctype:k">Danh sách đĩa nhạc</option>
+ <option value="ctype:l">Tài liệu luật</option>
+ <option value="ctype:m">Luận án, luận văn</option>
+ <option value="ctype:n">Tài liệu điều tra</option>
+ <option value="ctype:o">Bài phê bình</option>
+ <option value="ctype:p">Tài liệu lập trình</option>
+ <option value="ctype:q">Tài liệu điện ảnh</option>
+ <option value="ctype:r">Danh bạ điện thoại</option>
+ <option value="ctype:s">Sách thống kê</option>
+ <option value="ctype:t">Báo cáo kỹ thuật</option>
+ <option value="ctype:v">Ghi chú</option>
+ <option value="ctype:w">Báo cáo luật</option>
+ <option value="ctype:z">Điều ước quốc tế </option>
+ </select>
+ </fieldset>
+ </div> <!-- / .span3 -->
+ </div> <!-- / #subtypes -->
+ <!-- SUBTYPE LIMITS -->
+ [% END # / IF usmarc %]
+
+ [% IF ( UNIMARC ) %]
+ <div id="subtypes_unimarc">
+ <!-- SUBTYPE LIMITS -->
+ [% INCLUDE 'subtypes_unimarc.inc' %]
+ </div>
+ [% END %]
+
+ </div> <!-- / .row-fluid -->
+ [% END # / IF expanded_options %]
+ </div> <!-- / .row-fluid -->
+
+ [% IF ( OpacAdvSearchMoreOptions.size > 0 and expanded_options ) or ( OpacAdvSearchOptions.size > 0 and not expanded_options ) %]
+ <div class="row-fluid">
+ <div class="span12">
+ <div class="text-center">
+ <!-- SEARCH BUTTONS -->
+ [% PROCESS searchbuttons %]
+ <!-- /SEARCH BUTTONS -->
+ </div>
+ </div> <!-- / .span12 -->
+ </div> <!-- / .row-fluid -->
+ [% END %]
+</div> 
+</div><!-- / .main -->
+</form>
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK searchbuttons %]
+ <p>
+ <input value="Tìm kiếm" name="do" accesskey="s" class="btn btn-success" type="submit" title="Tìm kiếm" />
+
+ [% IF OpacAdvSearchMoreOptions.size > 0 %]
+ [% IF expanded_options %]
+ <a href="/cgi-bin/koha/opac-search.pl?expanded_options=0" class="btn btn-default more-less-options">Bớt tùy chọn</a>
+ [% ELSIF not expanded_options %]
+ <a href="/cgi-bin/koha/opac-search.pl?expanded_options=1" class="btn btn-default more-less-options">Thêm tùy chọn</a>
+ [% END %]
+ [% END %]
+
+ <a href="/cgi-bin/koha/opac-search.pl?do=Clear" class="btn btn-default new-search">Tìm kiếm mới</a>
+ </p>
+[% END %]
+
+[% BLOCK jsinclude %]
+<script type="text/javascript">//<![CDATA[
+    $(document).ready(function() {
+        $('#advsearches').tabs();
+    });
+    /* This function allows to display a new field to search.
+    */
+    $(document).on("click", '.ButtonPlus', function(e) {
+        e.preventDefault();
+        $('.ButtonLess').show();
+        var thisLine = $(this).parent();
+        var newLine = thisLine.clone();
+        newLine.find('input').val('');
+        thisLine.after(newLine);
+    });
+
+    $(document).on("click", '.ButtonLess', function(e) {
+        e.preventDefault();
+        if($(this).parent().siblings().length <= 3 ) {
+           $('.ButtonLess').hide();
+        }
+        $(this).parent().remove();
+    });
+    //]]>
+</script>
+[% END %]

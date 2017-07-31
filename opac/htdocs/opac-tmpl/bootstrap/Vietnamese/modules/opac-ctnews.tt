@@ -1,0 +1,205 @@
+[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] 
+
+
+</head>
+[% INCLUDE 'bodytag.inc' bodyid='opac-main' %]
+[% INCLUDE 'masthead.inc' %]
+
+
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a><span class="divider">›</span></li>
+ <li>
+ [% IF (cttin.idgroup == 1 || cttin.idgroup == 2) %]
+  <a href="/cgi-bin/koha/opac-news.pl">[% cttin.namegroup %]</a></li>
+ [% ELSIF (cttin.idgroup == 3) %]
+  <a href="/cgi-bin/koha/opac-dv.pl">[% cttin.namegroup %]</a><span class="divider">›</span></li>
+  <a style="color:#5ebf8a" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% cttin.idnew %]&idgroup=[% cttin.idgroup %]" title="[% cttin.title%]">[% cttin.title %]</a></li>
+ [% ELSIF (cttin.idgroup == 6) %]
+  <a href="/cgi-bin/koha/opac-chuyenmuc.pl">[% cttin.namegroup %]</a><span class="divider">›</span></li>
+  <a style="color:#5ebf8a" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% cttin.idnew %]&idgroup=[% cttin.idgroup %]" title="[% cttin.title%]">[% cttin.title %]</a></li>
+ [% ELSIF (cttin.idgroup == 8 ||cttin.idgroup == 9 || cttin.idgroup == 10 || cttin.idgroup == 11 ) %]
+ <a href="/cgi-bin/koha/opac-download.pl">[% cttin.namegroup %]</a><span class="divider">›</span></li>
+ <a style="color:#5ebf8a" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% cttin.idnew %]&idgroup=[% cttin.idgroup %]" title="[% cttin.title%]">[% cttin.title %]</a></li>
+ [% ELSIF (cttin.idgroup == 7) %]
+  <a href="/cgi-bin/koha/opac-faq.pl">[% cttin.namegroup %]</a>
+[% END %]
+ </ul>
+
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( loggedinusername ) %]
+ <div id="loggedin" class="container-fluid">
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+
+ <div class="row-fluid">
+	
+ <div class="span9">
+ <div style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;">
+	<h4 style="color:#342465"> [% cttin.title %]</h4>
+	<div id="ngaydang" style="clear: both;padding-bottom:10px;
+  font: normal 11px Arial, Helvetica, sans-serif;
+  color: #999999;">[Đăng ngày: [% cttin.timestamp %]]</div>
+	<div>
+		[% cttin.new %]
+	</div>
+</div>
+ </div> <!-- / .span 7/9 -->
+
+ 
+ <div class="span3">
+ [% IF (koha_news_count) %]
+
+[% IF (cttin.idgroup == 1) %]
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+	<h4 >Tin tức</h4>
+	<ul style="float:left;">
+	[% FOREACH koha_new IN koha_news %]
+		<li style=" float:left; margin-bottom:10px;">
+		<div  style="height:40px;overflow:hidden;float:right">
+			<a style="text-decoration:none;" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new.idnew %]&idgroup=[% koha_new.idgroup %]" title="[% koha_new.title%]">[% koha_new.title %]</a>
+		</div>
+		</li>
+	[% END %]	
+	</ul>
+</div>
+[% ELSIF (cttin.idgroup == 2) %]
+[% INCLUDE "nav-sukien.inc" %]
+[% INCLUDE "newbooksm.inc" %]
+[% ELSIF (cttin.idgroup == 3) %]
+<h4 >Dịch vụ</h4>
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+			
+		<ul style="padding:0px;margin:0px;width:100%; float:left">
+		[% FOREACH koha_new IN koha_news %]
+			<li style=" width:100%; float:left;margin-bottom:5px;">
+			<div class="thoigian" style="width:15%;float:left;">
+				<img src="[% koha_new.img %]">
+			</div>
+			<div class="tieudesk" style="width:70%;float:right; padding-right:10px;height:45px;overflow:hidden;">
+				<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new.idnew %]&idgroup=[% koha_new.idgroup %]">[% koha_new.title %]</a>
+			</div>
+				
+			</li>
+		[% END %]	
+		</ul>
+</div>
+[% ELSIF (cttin.idgroup == 4) %]
+[% INCLUDE "nav-sukien.inc" %]
+[% INCLUDE "newbooksm.inc" %]
+[% ELSIF (cttin.idgroup == 8 || cttin.idgroup == 9 || cttin.idgroup == 10 || cttin.idgroup == 11) %]
+<style>
+	.giomocua h4{ margin-top:0px; margin-bottom:0px;}
+</style>
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+	<h4 >Bộ cài đặt</h4>
+	<ul style="width:90%;float:left; margin-bottom:10px;">
+	[% FOREACH bocaidat IN bocaidats %]
+		<li style="width:100%; float:left; ">
+			<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% bocaidat.idnew %]&idgroup=[% bocaidat.idgroup %]">[% bocaidat.title %]</a>
+		</li>
+	[% END %]	
+	<!--
+	<li style="width:100%; float:left; "><a href="http://www.ubuntu.com/download" target="_blank" >Hệ điều hành Ubuntu</a></li>
+	<li style="width:100%; float:left; "><a href="http://download.koha-community.org/" target="_blank" >Phần mềm Koha (Phiên bản mới)</a></li>
+	<li style="width:100%; float:left; "><a href="http://download.koha-community.org/old_releases/" target="_blank" >Phần mềm Koha (Phiên bản cũ)</a></li>
+	<li style="width:100%; float:left; "><a href="http://translate.koha-community.org/vi/" target="_blank">Việt hóa Koha</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/koha-3.12.06.tar.gz" target="_blank">Việt hóa Koha 3.12.06</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/Koha-Live-TV.iso" target="_blank">DVD Live Koha 3.12</a></li>
+	-->
+	</ul>
+	
+	<h4 >Hướng dẫn cài đặt</h4>
+	<ul style="width:90%;float:left;margin-bottom:10px;">
+	[% FOREACH hdcaidat IN hdcaidats %]
+		<li style="width:100%; float:left; ">
+			<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% hdcaidat.idnew %]&idgroup=[% hdcaidat.idgroup %]">[% hdcaidat.title %]</a>
+		</li>
+	[% END %]	
+	<!--
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/190" target="_blank">HĐH Ubuntu trên VMWare</a></li>
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/190" target="_blank">HĐH Ubuntu trên máy chủ - máy tính</a></li>
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/191" target="_blank">Cài đặt Koha Common</a></li>
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/191" target="_blank">Cài đặt Koha Tarball</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/Ubuntu-Demo.avi" target="_blank">Video HD cài đặt Ubuntu</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/Koha_liveCD.avi" target="_blank">Video HD cài đặt Koha Live DVD</a></li>
+	-->
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/88" target="_blank">Cài đặt modul tiếng Việt</a></li>
+								
+	</ul>
+	<h4 >Hướng dẫn sử dụng</h4>
+	<ul style="width:90%;float:left;margin-bottom:10px;">
+	[% FOREACH hdsudung IN hdsudungs %]
+	<li style="width:100%; float:left; ">
+			<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% hdsudung.idnew %]&idgroup=[% hdsudung.idgroup %]">[% hdsudung.title %]</a>
+	</li>
+	[% END %]
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/192" target="_blank">Phần mềm Koha 3.12</a></li>
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/194" target="_blank">Phần mềm Koha 3.16</a></li>
+	<li style="width:100%; float:left; "><a href="http://dspace.vn/handle/11461/195" target="_blank">Phần mềm Koha 3.18</a></li>
+	<li style="width:100%; float:left; "><a href="#" target="_blank">Phần mềm Koha 3.20</a></li>
+	</ul>
+	<h4>Tài liệu khác</h4>
+	<ul style="width:90%;float:left;margin-bottom:10px;">
+	[% FOREACH tailieukhac IN tailieukhacs %]
+		<li style="width:100%; float:left; ">
+			<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% tailieukhac.idnew %]&idgroup=[% tailieukhac.idgroup %]">[% tailieukhac.title %]</a>
+		</li>
+	[% END %]
+	<li style="width:100%; float:left; "><a href="http://wiki.koha-community.org/wiki/Main_Page" target="_blank">Wiki Koha</a></li>
+	<!--
+	<li style="width:100%; float:left; "><a href="http://schema.koha-community.org/index.html" target="_blank">Cấu trúc Koha</a></li>
+	<li style="width:100%; float:left; "><a href="http://wiki.koha-community.org/wiki/SQL_Reports_Library" target="_blank">Báo cáo Koha</a></li>
+	-->
+	<li style="width:100%; float:left; "><a href="http://www.librarytechnology.org/map.pl?ILS=Koha" target="_blank">Thư viện sử dụng Koha</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/FOSS-Introduction-Library.pdf" target="_blank">Ứng dụng PMNM trong giáo dục</a></li>
+	<li style="width:100%; float:left; "><a href="../../opac-tmpl/bootstrap/images/download/Koha_Dspace_danhgiaxephang.pdf" target="_blank">Xếp hạng đại học bằng Koha - Dspace</a></li>	
+	</ul>
+</div>
+[% ELSIF ( cttin.idgroup == 7) %]
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+	<h4 >Hỏi đáp</h4>
+	<ul style="float:left;">
+	[% FOREACH koha_new IN koha_news %]
+		<li style=" float:left; margin-bottom:10px;">
+		<div  style="height:40px;overflow:hidden;float:right">
+			<a style="text-decoration:none;" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new.idnew %]&idgroup=[% koha_new.idgroup %]" title="[% koha_new.title%]">[% koha_new.title %]</a>
+		</div>
+		</li>
+	[% END %]	
+	</ul>
+</div>
+[% ELSIF (cttin.idgroup == 6) %]
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+	<h4 >Thư mục chuyên đề</h4>
+	<ul style="float:left;">
+	[% FOREACH koha_new IN koha_news %]
+		<li style=" float:left; margin-bottom:10px;">
+		<div  style="height:40px;overflow:hidden;float:right">
+			<a style="text-decoration:none;" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new.idnew %]&idgroup=[% koha_new.idgroup %]" title="[% koha_new.title%]">[% koha_new.title %]</a>
+		</div>
+		</li>
+	[% END %]	
+	</ul>
+</div>
+[% END %]
+
+[% END %]
+
+[% INCLUDE "lienketweb.inc" %]
+
+
+
+ </div> <!-- / .span3 -->
+
+
+ </div> <!-- /.container-fluid -->
+ </div> <!-- /.row-fluid -->
+</div> <!-- /.main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

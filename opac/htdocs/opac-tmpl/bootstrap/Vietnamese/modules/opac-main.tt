@@ -1,0 +1,66 @@
+[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] 
+
+
+</head>
+[% INCLUDE 'bodytag.inc' bodyid='opac-main' %]
+[% INCLUDE 'masthead.inc' %]
+
+<style>
+.breadcrumb{
+	display:none;
+}
+</style>
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a></li>
+ </ul>
+
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( loggedinusername ) %]
+ <div id="loggedin" class="container-fluid">
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+
+ <div class="row-fluid">
+	
+
+ <div class="span9">
+ [% IF ( display_daily_quote && daily_quote ) %]
+            <div id="daily-quote" style="margin-top:-4px;background:rgba(179, 174, 174, 0.51);height:30px;">
+                <div>
+					<p style="padding-top:5px;padding-left:10px;">
+						<span id="dailyncb" style="color:red;font-size:17px;font-weight:bold;">Quote of the Day: </span><span id="daily-quote-text" style="color:blue;font-size:14px;">[% daily_quote.text %]</span><span id="daily-quote-sep"> </span>
+					</p>
+				</div>
+            </div>
+        [% END %]
+	[% INCLUDE "newbook.inc" %]
+
+	<div class="row-fluid">
+		[% INCLUDE "bosuutap.inc" %]
+		[% INCLUDE "sukiennoibat.inc" %]
+	
+	</div>
+ </div> <!-- / .span 7/9 -->
+
+ 
+ <div class="span3">
+[% INCLUDE "giomocua.inc" %]
+
+
+[% INCLUDE "calendars.inc" %]
+
+[% INCLUDE "lienketweb.inc" %]
+ </div> <!-- / .span3 -->
+
+
+ </div> <!-- /.container-fluid -->
+ </div> <!-- /.row-fluid -->
+</div> <!-- /.main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

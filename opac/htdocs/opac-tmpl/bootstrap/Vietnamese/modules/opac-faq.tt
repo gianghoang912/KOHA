@@ -1,0 +1,95 @@
+[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] 
+
+<style>
+@media (min-width: 768px){
+	.item .img-book{
+		margin-left:40px;
+	}
+	.item .title-book{
+		margin-left:40px;
+	}
+}
+</style>
+
+</head>
+[% INCLUDE 'bodytag.inc' bodyid='opac-main' %]
+[% INCLUDE 'masthead.inc' %]
+
+
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a><span class="divider">›</span></li>
+ <li><a href="/cgi-bin/koha/opac-faq.pl">Hỏi đáp</a></li>
+ </ul>
+
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( loggedinusername ) %]
+ <div id="loggedin" class="container-fluid">
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+ [% ELSE %]
+ <div id="notloggedin" class="container-fluid">
+ [% END %]
+
+ <div class="row-fluid">
+	
+ <div class="span9">
+	<div class="row-fluid">
+		<div class="bs-docs-ttsk">
+            
+              
+              <div class="tab-content" style="padding-bottom: 9px; border-bottom: 1px solid #ddd;">
+                <div class="tab-pane active" id="tintuc">
+					[% FOREACH koha_new1 IN koha_news %]
+	
+					<div class="tt-ct">
+						
+						<div class="tt-item" style="width:100%;">
+							<h5><a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new1.idnew %]&idgroup=[% koha_new1.idgroup %]">[% koha_new1.title %]</a></h5>
+							<div class="tt-tt" style="max-height:60px; overflow:hidden;">
+								[% koha_new1.sub %]
+								
+							</div>
+							<a style="float:right" href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new1.idnew %]&idgroup=[% koha_new1.idgroup %]">Xem thêm</a>
+						</div>
+					</div>
+					[% END %]
+                </div>
+              </div>
+          </div>
+	
+	</div>
+ </div> <!-- / .span 7/9 -->
+
+ 
+ <div class="span3">
+[% INCLUDE "nav-sukien.inc" %]
+[% INCLUDE "newbooksm.inc"%]
+<h4 >Dịch vụ</h4>
+<div class="giomocua" style="border:10px solid #f1f2f4; border-radius:5px; padding:10px;float:left;">
+			
+		<ul style="padding:0px;margin:0px;width:100%; float:left">
+		[% FOREACH koha_new IN dichvus %]
+			<li style="list-style:none; width:100%; float:left;margin-bottom:5px;">
+			<div class="thoigian" style="width:15%;float:left;">
+				<img src="[% koha_new.img %]">
+			</div>
+			<div class="tieudesk" style="width:70%;float:right; padding-right:10px;height:45px;overflow:hidden;">
+				<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new.idnew %]&idgroup=[% koha_new.idgroup %]">[% koha_new.title %]</a>
+			</div>
+				
+			</li>
+		[% END %]	
+		</ul>
+</div>
+[% INCLUDE "lienketweb.inc" %]
+ </div> <!-- / .span3 -->
+
+
+ </div> <!-- /.container-fluid -->
+ </div> <!-- /.row-fluid -->
+</div> <!-- /.main -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %][% END %]

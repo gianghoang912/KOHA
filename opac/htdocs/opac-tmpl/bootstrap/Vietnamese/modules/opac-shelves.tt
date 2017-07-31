@@ -1,0 +1,1022 @@
+[% USE Koha %] [% SET TagsShowEnabled = ( ( Koha.Preference( 'TagsEnabled' ) == 1 ) && TagsShowOnList ) %] [% SET TagsInputEnabled = ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'TagsEnabled' ) == 1 ) && TagsInputOnList ) %] [% INCLUDE 'doc-head-open.inc' %][% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  &rsaquo; [% IF ( viewshelf ) %]Nội dung của giá sách ảo [% shelfname |html %][% ELSE %]Giá sách ảo của bạn[% END %][% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] </head>
+[% IF ( loggedinusername ) %][% INCLUDE 'bodytag.inc' bodyid='opac-userlists' bodyclass='scrollto' %][% ELSE %][% INCLUDE 'bodytag.inc' bodyid='opac-lists' bodyclass='scrollto' %][% END %]
+
+[% BLOCK list_permissions %]
+ <li>
+ <label for="allow_add">Phân quyền: </label>
+ <select name="allow_add" id="allow_add">
+ [% IF allow_add %]<option value="0">Không cho phép</option>[% ELSE %]<option value="0" selected="selected">Không cho phép</option>[% END %]
+ [% IF allow_add %]<option value="1" selected="selected">Cho phép</option>[% ELSE %]<option value="1">Cho phép</option>[% END %]
+ </select>
+ &nbsp;<span>bạn đọc thêm tài liệu vào giá sách ảo.</span>
+ </li>
+ <li>
+ <label>&nbsp;</label>
+ <select name="allow_delete_own" id="allow_delete_own">
+ [% IF allow_delete_own %]<option value="0">Không cho phép</option>[% ELSE %]<option value="0" selected="selected">Không cho phép</option>[% END %]
+ [% IF allow_delete_own %]<option value="1" selected="selected">Cho phép</option>[% ELSE %]<option value="1">Cho phép</option>[% END %]
+ </select>
+ &nbsp;<span> bạn đọc loại bỏ các tài liệu mình thêm vào giá sách ảo.</span>
+ </li>
+ <li>
+ <label>&nbsp;</label>
+ <select name="allow_delete_other" id="allow_delete_other">
+ [% IF allow_delete_other %]<option value="0">Không cho phép</option>[% ELSE %]<option value="0" selected="selected">Không cho phép</option>[% END %]
+ [% IF allow_delete_other %]<option value="1" selected="selected">Cho phép</option>[% ELSE %]<option value="1">Cho phép</option>[% END %]
+ </select>
+ &nbsp;<span> bạn đọc loại bỏ tất cả các tài liệu có trong giá sách ảo.</span>
+ </li>
+[% END %]
+[% BLOCK remove_share %]
+ [%# Use: add parameter shelfnumber and add end form tag %]
+ <form action="opac-shelves.pl" method="post" class="form-inline">
+ <input type="hidden" name="shelves" value="1" />
+ <input type="hidden" name="display" value="privateshelves" />
+ <input type="submit" class="deleteshelf" onclick="return confirmDelete(MSG_CONFIRM_REMOVE_SHARE);" value="Loại bỏ chia sẻ" />
+[% END %]
+
+[% INCLUDE 'masthead.inc' %]
+<div class="main">
+ <ul class="breadcrumb">
+ <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a> <span class="divider">&rsaquo;</span></li>
+ [% IF ( loggedinusername ) %]
+ <li><a href="/cgi-bin/koha/opac-user.pl">[% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</a> <span class="divider">&rsaquo;</span></li>
+ [% END %]
+
+ [% IF ( category1 ) %]
+ [% IF ( viewshelf || edit ) %]
+ <li><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Giá sách cá nhân </a></li>
+ [% ELSE %]
+ <li>Giá sách cá nhân </li>
+ [% END %]
+ [% ELSIF ( category2 ) %]
+ [% IF ( viewshelf || edit ) %]
+ <li><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Giá sách cộng đồng</a></li>
+ [% ELSE %]
+ <li>Giá sách cộng đồng</li>
+ [% END %]
+ [% ELSIF ( showprivateshelves ) %]
+ [% IF ( viewshelf || edit ) %]
+ <li><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Giá sách cá nhân </a></li>
+ [% ELSE %]
+ <li>Giá sách cá nhân </li>
+ [% END %]
+ [% ELSIF ( showpublicshelves ) %]
+ [% IF ( viewshelf || edit || shelves ) %]
+ <li><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Giá sách cộng đồng</a></li>
+ [% ELSE %]
+ <li>Giá sách cộng đồng</li>
+ [% END %]
+ [% END %]
+
+ [% IF ( viewshelf ) %]
+ <li><span class="divider">&rsaquo;</span> Giá sách ảo: <i>[% shelfname | html %]</i></li>
+ [% END %]
+
+ [% IF ( shelves ) %]
+ <li><span class="divider">&rsaquo;</span> Tạo giá sách ảo</li>
+ [% END %]
+
+ [% IF ( edit ) %]
+ <li><span class="divider">&rsaquo;</span> Chỉnh sửa giá sách ảo: <i>[% shelfname | html %]</i></li>
+ [% END %]
+
+ </ul> <!-- / .breadcrumb -->
+
+ <div class="container-fluid">
+ <div class="row-fluid">
+ [% IF ( OpacNav||loggedinusername ) %]
+ <div class="span2">
+ <div id="navigation">
+ [% INCLUDE 'navigation.inc' IsPatronPage=1 %]
+ </div>
+ </div>
+ [% END %]
+
+ [% IF ( OpacNav||loggedinusername ) %]
+ <div class="span10">
+ [% ELSE %]
+ <div class="span12">
+ [% END %]
+ <div id="usershelves" class="maincontent">
+
+ [% IF ( paramsloop ) %]
+ [% FOREACH paramsloo IN paramsloop %]
+ [% IF ( paramsloo.already ) %]<div class="alert">Tên giá sách ảo <b>[% paramsloo.already %]</b> đã tồn tại!</div>[% END %]
+ [% IF ( paramsloo.addshelf_failed ) %]<div class="dialog alert">Không thể tạo giá sách ảo. [% IF loggedinuser==0 %](Không sử dụng tài khoản quản trị cơ sở dữ liệu.)[% END %]</div>[% END %]
+ [% IF ( paramsloo.status ) %]<div class="alert">[% paramsloo.string %]</div>[% END %]
+ [% IF ( paramsloo.nobarcode ) %]<div class="alert">Lỗi: Không có đăng ký cá biệt.</div>[% END %]
+ [% IF ( paramsloo.noshelfnumber ) %]<div class="alert">Lỗi: Không có mã xếp giá.</div>[% END %]
+ [% IF ( paramsloo.need_confirm ) %]
+ <div class="alert">
+ Giá sách ảo <i>[% paramsloo.need_confirm %]</i> hiện tại có chứa tài liệu. <br />Bao gồm <b>[% paramsloo.count %]</b> [% IF ( paramsloo.single ) %]tài liệu trong giá sách ảo[% ELSE %]tài liệu trong giá sách ảo[% END %]. <br />Chọn  "Xác nhận" để xác nhận việc xóa dữ liệu của bạn. </div>
+ [% END %]
+ [% IF ( paramsloo.nopermission ) %]
+ <div class="alert">Lỗi: Bạn không có quyền thao tác trong giá sách ảo [% paramsloo.nopermission |html%].</div>
+ [% END %]
+ [% IF ( paramsloo.failgetitem ) %]
+ <div class="alert">Lỗi: Không tìm thấy tài liệu với đăng ký cá biệt [% paramsloo.failgetitem %].</div>
+ [% END %]
+ [% IF ( paramsloo.duplicatebiblio ) %]
+ <div class="alert">Biểu ghi phù hợp với đăng ký cá biệt <b>[% paramsloo.duplicatebiblio %]</b> đã có trong giá sách ảo.</div>
+ [% END %]
+ [% IF ( paramsloo.delete_ok ) %]
+ <div class="alert alert-info">Giá sách ảo [% paramsloo.delete_ok %] đã bị xóa.</div>
+ [% END %]
+ [% IF ( paramsloo.delete_fail ) %]
+ <div class="alert alert-info">Lỗi cơ sở dữ liệu: Bạn không thể xóa giá sách ảo (Giá sách ảo số [% paramsloo.delete_fail %]).</div>
+ [% END %]
+ [% IF ( paramsloo.unrecognized ) %]
+ <div class="alert alert-info">Lỗi: Giá sách ảo số [% paramsloo.unrecognized %] không được công nhận.</div>
+ [% END %]
+ [% IF ( paramsloo.modifyfailure) %]
+ <div class="alert alert-info">Lỗi: Giá sách ảo không thể đổi tên thành [% paramsloo.modifyfailure %]. Tên này có thể đã tồn tại, bạn vui lòng kiểm tra lại thông tin.</div>
+ [% END %]
+ [% IF ( paramsloo.nothingdeleted) %]
+ <div class="alert alert-info">Cảnh báo: Bạn không thể xóa bất kỳ  tài liệu nào đã được lựa chọn từ giá sách ảo này.</div>
+ [% END %]
+ [% IF ( paramsloo.somedeleted) %]
+ <div class="alert alert-info">Cảnh báo: Bạn không thể xóa tất cả tài liệu từ giá sách ảo này.</div>
+ [% END %]
+ [% END # / FOREACH paramsloop %]
+ [% END # / IF paramsloop %]
+
+ [% IF ( viewshelf ) %]<!-- Viewing a particular shelf -->
+ <h3>[% shelfname |html %]</h3>
+ [% IF ( itemsloop ) %]
+ <div id="toolbar" class="toolbar clearfix">
+ <div class="list-actions">
+ <a class="newshelf" href="/cgi-bin/koha/opac-shelves.pl?shelves=1">Tạo giá sách ảo</a> <span class="sep">|</span>
+ <a href="/cgi-bin/koha/opac-downloadshelf.pl?shelfid=[% shelfnumber | html %]&amp;showprivateshelves=[% showprivateshelves | html %]" class="download" data-toggle="modal" data-target="#modalWin">Tải giá sách ảo</a>
+
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ <span class="sendlist"><a href="/cgi-bin/koha/opac-sendshelf.pl?shelfid=[% shelfnumber | html %]" class="send" onclick="open('/cgi-bin/koha/opac-sendshelf.pl?shelfid=[% shelfnumber | html %]','win_form','scrollbars=no,resizable=no,height=300,width=450,top=50,left=100'); return false; ">Gửi Email</a></span>
+ [% END %]
+
+ <a class="print-small" href="/cgi-bin/koha/opac-shelves.pl" onclick="print(); return false;">In thông tin</a>
+
+ [% IF ( manageshelf ) %]
+ <span class="sep">|</span>
+ <form method="get" action="/cgi-bin/koha/opac-shelves.pl" class="form-inline">
+ <input type="hidden" name="op" value="modif" />
+ <input type="hidden" name="display" value="viewshelf" />
+ <input type="hidden" name="shelfnumber" value="[% shelfnumber | html %]" />
+ <input value="Chỉnh sửa" class="editshelf" type="submit" />
+ </form>
+
+ <form method="post" action="/cgi-bin/koha/opac-shelves.pl" class="form-inline">
+ <input type="hidden" value="1" name="shelves"/>
+ <input type="hidden" value="1" name="DEL-[% shelfnumber | html %]"/>
+ [% IF ( showprivateshelves ) %]
+ <input type="hidden" name="display" value="privateshelves"/>
+ [% END %]
+ <input type="submit" class="deleteshelf" value="Xóa giá sách" onclick="return confirmDelete(MSG_CONFIRM_DELETE_LIST);" />
+ </form>
+ [% IF showprivateshelves && Koha.Preference('OpacAllowSharingPrivateLists') %]
+ <a href="/cgi-bin/koha/opac-shareshelf.pl?op=invite&shelfnumber=[% shelfnumber | html %]" class="">Chia sẻ giá sách ảo</a>
+ [% END %]
+ [% ELSIF showprivateshelves # not manageshelf and private means shared %]
+ [% INCLUDE remove_share %]
+ <input type="hidden" name="REMSHR-[% shelfnumber | html %]" value="1" />
+ </form>
+ [% END # / IF manageshelf %]
+ </div>
+
+ <form action="/cgi-bin/koha/opac-shelves.pl" id="sorting-form" class="form-inline sort_by pull-right">
+ <input type="hidden" name="viewshelf" value="[% shelfnumber | html %]" />
+
+ <label for="sort">Sắp xếp theo: </label>
+ <select name="sort" id="sort" class="resort" onchange="$('#sorting-form').submit()">
+ <option value="">Mặc định</option>
+
+ [% IF sort == 'author' %]
+ <option value="author" selected="selected">Tác giả</option>
+ [% ELSE %]
+ <option value="author">Tác giả</option>
+ [% END %]
+
+ [% IF sort == 'title' %]
+ <option value="title" selected="selected">Nhan đề</option>
+ [% ELSE %]
+ <option value="title">Nhan đề</option>
+ [% END %]
+
+ [% IF sort == 'itemcallnumber' %]
+ <option value="itemcallnumber" selected="selected">Ký hiệu phân loại</option>
+ [% ELSE %]
+ <option value="itemcallnumber">Ký hiệu phân loại</option>
+ [% END %]
+
+ [% IF sort == 'copyrightdate' %]
+ <option value="copyrightdate" selected="selected">Năm xuất bản</option>
+ [% ELSE %]
+ <option value="copyrightdate">Năm xuất bản</option>
+ [% END %]
+ </select>
+
+ <select name="direction" class="resort" onchange="$('#sorting-form').submit()">
+ [% IF direction == 'asc' %]
+ <option value="asc" selected="selected">Tăng dần</option>
+ [% ELSE %]
+ <option value="asc">Tăng dần</option>
+ [% END %]
+
+ [% IF direction == 'desc' %]
+ <option value="desc" selected="selected">Giảm dần</option>
+ [% ELSE %]
+ <option value="desc">Giảm dần</option>
+ [% END %]
+ </select>
+
+ <input type="submit" class="btn btn-small" id="sort-submit" value="Sắp xếp" />
+ </form>
+
+ </div> <!-- / #toolbar -->
+
+ <div id="selections-toolbar" class="toolbar">
+ <span class="checkall"></span> <span class="clearall"></span> <span class="sep">|</span>
+ <span class="links">
+ <span id="selections">Chọn nhan đề để: </span>
+ [% IF Koha.Preference( 'RequestOnOpac' ) == 1 %]
+ <span id="placehold"></span>
+ [% END %]
+ [% IF ( TagsInputEnabled && loggedinusername ) %]
+ <span id="addtags">
+ <a id="tagsel_tag" href="#" class="disabled">Tạo từ khóa</a>
+ </span>
+ <span id="tagsel_form" style="display:none">
+ <label for="tagsel_new">Thêm từ khóa, ngăn cách bằng dấu phẩy:</label>
+ <input name="tagsel_new" id="tagsel_new" maxlength="100" />
+ <input id="tagsel_button" title="tagsel_button" class="tagsel_button btn btn-small" type="submit" name="tagsel_button" value="Tạo" />
+ <a href="#" id="tagsel_cancel">Hủy bỏ</a>
+ </span>
+ [% END %]
+ [% IF ( loggedinusername && allowremovingitems ) %]
+ <span id="removeitems"></span>
+ [% END %]
+ </span> <!-- / .links -->
+ </div> <!-- / #selections-toolbar -->
+
+ <form action="/cgi-bin/koha/opac-shelves.pl" method="post" id="myform" name="myform" class="checkboxed">
+ [% IF ( manageshelf ) %]
+ <input type="hidden" name="viewshelf" value="[% shelfnumber | html %]" />
+ <input type="hidden" name="modifyshelfcontents" value="1" />
+ [% END %]
+ <div class="searchresults">
+ <table id="listcontents" class="table">
+ <tbody>
+ [% FOREACH itemsloo IN itemsloop %]
+ <tr>
+ <td class="select selectcol"><input type="checkbox" class="cb" name="REM-[% itemsloo.biblionumber %]" value="[% itemsloo.biblionumber %]" /></td>
+ [% UNLESS ( item_level_itypes ) %]
+ <td>
+ [% UNLESS ( noItemTypeImages ) %]
+ <img src="[% itemsloo.imageurl %]" alt="[% itemsloo.description %]" title="[% itemsloo.description %]" />
+ [% END %]
+ [% itemsloo.description %]
+ </td>
+ [% END %]
+ <td>
+ <div class="coverimages">
+ <a class="p1" href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% itemsloo.biblionumber %]">
+ [% IF ( OPACLocalCoverImages ) %]
+ <span title="[% itemsloo.biblionumber |url %]" class="[% itemsloo.biblionumber %]" id="local-thumbnail[% loop.count %]"></span>
+ [% END %]
+
+ [% IF ( OPACAmazonCoverImages ) %]
+ [% IF ( itemsloo.normalized_isbn ) %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="amazon-thumbnail[% loop.count %]"><img src="http://images.amazon.com/images/P/[% itemsloo.normalized_isbn %].01.TZZZZZZZ.jpg" alt="" /></span>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF ( SyndeticsEnabled && SyndeticsCoverImages ) %]
+ [% IF ( using_https ) %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="syndetics-thumbnail[% loop.count %]"><img src="https://secure.syndetics.com/index.aspx?isbn=[% itemsloo.normalized_isbn %]/SC.GIF&amp;client=[% SyndeticsClientCode %]&amp;type=xw10&amp;upc=[% itemsloo.normalized_upc %]&amp;oclc=[% itemsloo.normalized_oclc %]" alt="" /></span>
+ [% ELSE %]
+ <span title="[% SEARCH_RESULT.biblionumber %]" id="syndetics-thumbnail[% loop.count %]"><img src="http://www.syndetics.com/index.aspx?isbn=[% itemsloo.normalized_isbn %]/SC.GIF&amp;client=[% SyndeticsClientCode %]&amp;type=xw10&amp;upc=[% itemsloo.normalized_upc %]&amp;oclc=[% itemsloo.normalized_oclc %]" alt="" /></span>
+ [% END %]
+ [% END %]
+
+ [% IF ( GoogleJackets ) %]
+ [% IF ( itemsloo.normalized_isbn ) %]
+ <div title="[% itemsloo.biblionumber |url %]" class="[% itemsloo.normalized_isbn %]" id="gbs-thumbnail[% loop.count %]"></div>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ [% IF OpenLibraryCovers %]
+ [% IF itemsloo.normalized_isbn %]
+ <span title="[% itemsloo.biblionumber %]" class="[% itemsloo.normalized_isbn %]" id="openlibrary-thumbnail[% loop.count %]"></span>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+
+ </a> <!-- / .p1 -->
+ [% IF ( BakerTaylorEnabled ) %]
+ [% IF ( itemsloo.normalized_isbn ) %]
+ <a href="https://[% BakerTaylorBookstoreURL |html %][% itemsloo.normalized_isbn %]"><img src="[% BakerTaylorImageURL |html %][% itemsloo.normalized_isbn %]" alt="Xem thêm tại Baker & Taylor" /></a>
+ [% ELSE %]
+ <span class="no-image">Tài liệu không có ảnh bìa</span>
+ [% END %]
+ [% END %]
+ </div>
+ [% IF ( itemsloo.XSLTBloc ) %]
+ [% itemsloo.XSLTBloc %]
+ [% ELSE %]
+
+ [% IF ( itemsloo.BiblioDefaultViewmarc ) %]
+ <a href="/cgi-bin/koha/opac-MARCdetail.pl?biblionumber=[% itemsloo.biblionumber |url %]" title="Xem chi tiết nhan đề này" class="title">
+ [% ELSE %]
+ [% IF ( itemsloo.BiblioDefaultViewisbd ) %]
+ <a href="/cgi-bin/koha/opac-ISBDdetail.pl?biblionumber=[% itemsloo.biblionumber |url %]" title="Xem chi tiết nhan đề này" class="title">
+ [% ELSE %]
+ <a title="Xem chi tiết nhan đề này" class="title" href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% itemsloo.biblionumber |url %]">
+ [% END %] [% END %] [% IF ( itemsloo.title ) %] [% itemsloo.title |html %] [% ELSE %] Tài liệu không có nhan đề [% END %] [% FOREACH subtitl IN itemsloo.subtitle %] [% subtitl.subfield|html %] [% END %] </a>
+
+ [% IF ( itemsloo.author ) %] Tác giả <a href="/cgi-bin/koha/opac-search.pl?q=au:[% itemsloo.author |url %]" title="Tìm kiếm theo tác giả" class="author">[% itemsloo.author %]</a>
+ [% ELSE %]
+ &nbsp;
+ [% END %]
+
+ <span class="results_summary">
+ <span class="label">Xuất bản:</span>
+ [% IF ( itemsloo.place ) %]
+ [% itemsloo.place %]
+ [% END %]
+ [% IF ( itemsloo.publishercode ) %]
+ [% itemsloo.publishercode|html %]
+ [% END %]
+ [% IF ( itemsloo.publicationyear ) %]
+ [% itemsloo.publicationyear %]
+ [% ELSE %]
+ [% IF ( itemsloo.copyrightdate ) %]
+ [% itemsloo.copyrightdate %]
+ [% END %]
+ [% END %]
+ [% IF ( itemsloo.pages ) %]. [% itemsloo.pages %][% END %]
+ [% IF ( itemsloo.notes ) %], [% itemsloo.notes|html %][% END %]
+ [% IF ( itemsloo.item('size') ) %] [% itemsloo.item('size') %][% END %]
+ </span>
+ <span class="results_summary">
+ <span class="label">Bản tài liệu:</span>
+ [% IF ( itemsloo.ITEM_RESULTS ) %]
+ [% FOREACH ITEM_RESULT IN itemsloo.ITEM_RESULTS %]
+ [% ITEM_RESULT.homebranch %]
+ [% IF ( ITEM_RESULT.location_opac ) %]
+ , [% ITEM_RESULT.location_opac %]
+ [% END %]
+ [% IF ( ITEM_RESULT.itemcallnumber ) %]
+ ([% ITEM_RESULT.itemcallnumber %])
+ [% IF ( loop.last ) %].[% ELSE %],[% END %]
+ [% END %]
+ [% END %]
+ [% ELSE %]
+ Biểu ghi này không có ĐKCB.
+ [% END %]
+ </span>
+ [% END # / IF itemsloo.XSLTBloc %]
+
+ [% IF ( TagsShowEnabled && itemsloo.TagLoop.size ) %]
+ <div class="results_summary tags">
+ <span class="label">Từ khóa:</span>
+ <ul>
+ [% FOREACH TagLoo IN itemsloo.TagLoop %]
+ <li><a href="/cgi-bin/koha/opac-search.pl?tag=[% TagLoo.term |url %]&amp;q=[% TagLoo.term |url %]">[% TagLoo.term %]</a> <span class="weight">([% TagLoo.weight_total %])</span></li>
+ [% END %]
+ </ul>
+ </div>
+ [% END %]
+
+ <span class="results_summary">
+
+ [% IF Koha.Preference( 'RequestOnOpac' ) == 1 %]
+ [% UNLESS ( itemsloo.norequests ) %]
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( AllowOnShelfHolds ) %]
+ <span class="actions"><a class="hold" href="/cgi-bin/koha/opac-reserve.pl?biblionumber=[% itemsloo.biblionumber %]">Đặt mượn</a><!-- add back when available 0 holds in queue--></span>
+ [% ELSE %]
+ [% IF ( itemsloo.itemsissued ) %]
+ <span class="actions"><a class="hold" href="/cgi-bin/koha/opac-reserve.pl?biblionumber=[% itemsloo.biblionumber %]">Đặt mượn</a><!-- add back when available 0 holds in queue--></span>
+ [% END %]
+ [% END %]
+ [% END # / IF opacuserlogin %]
+ [% END # / UNLESS itemsloo.norequests %]
+ [% END # / RequestOnOpac %]
+
+ [% IF ( TagsInputEnabled ) %]
+ [% IF ( loggedinusername ) %]
+ <span class="actions"><a class="tag_add hidden" id="tag_add[% itemsloo.biblionumber %]" href="#">Tạo từ khóa</a></span>
+ <div id="tagform[% itemsloo.biblionumber %]" class="tag_results_input" style="display:none;">
+ <label for="newtag[% itemsloo.biblionumber %]">Thêm từ khóa, ngăn cách bằng dấu phẩy:</label>
+ <input name="newtag[% itemsloo.biblionumber %]" id="newtag[% itemsloo.biblionumber %]" maxlength="100" />
+ <input value="Tạo" name="tagbutton" class="tagbutton btn btn-small" type="submit" title="[% itemsloo.biblionumber %]" />
+ <a class="cancel_tag_add" id="cancel[% itemsloo.biblionumber %]" href="#">(Hoàn thành)</a>
+ </div>
+ <div id="newtag[% itemsloo.biblionumber %]_status" class="tagstatus" style="display:none;">
+ Trạng thái từ khóa. </div>
+ [% ELSIF ( loop.first ) %]
+ <span class="tagstatus" id="login4tags">Đăng nhập để thêm từ khóa.</span>
+ [% END # / IF loggedinusername %]
+ [% END # / IF TagsInputEnabled %]
+
+ [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && loggedinusername && ( Koha.Preference( 'virtualshelves' ) == 1 ) ) %]
+ <span class="actions"><a class="addtoshelf" href="/cgi-bin/koha/opac-addbybiblionumber.pl?biblionumber=[% itemsloo.biblionumber %]" onclick="Dopop('opac-addbybiblionumber.pl?biblionumber=[% itemsloo.biblionumber %]'); return false;">Thêm vào giá sách ảo khác</a></span>
+ [% END %]
+
+ [% IF ( allowremovingitems ) %]
+ <span class="actions"><a class="removefromlist hidden" id="REM-[% itemsloo.biblionumber %]" href="#">Loại bỏ khỏi giá sách</a></span>
+ [% END %]
+
+ [% IF Koha.Preference( 'opacbookbag' ) == 1 %]
+ [% IF ( itemsloo.incart ) %]
+ <span class="actions"><a class="addtocart cart[% itemsloo.biblionumber %] hidden" href="#" onclick="addRecord('[% itemsloo.biblionumber %]'); return false;">Trong giỏ tài liệu</a> <a class="cartRemove cartR[% itemsloo.biblionumber %] hidden" href="#" onclick="delSingleRecord('[% itemsloo.biblionumber %]'); return false;">(Loại bỏ)</a></span>
+ [% ELSE %]
+ <span class="actions"><a class="addtocart cart[% itemsloo.biblionumber %] hidden" href="#" onclick="addRecord('[% itemsloo.biblionumber %]'); return false;">Thêm vào giỏ tài liệu</a> <a style="display:none;" class="cartRemove cartR[% itemsloo.biblionumber %] hidden" href="#" onclick="delSingleRecord('[% itemsloo.biblionumber %]'); return false;">(Loại bỏ)</a></span>
+ [% END %]
+ [% END # / IF opacbookbag %]
+ </span> <!-- / .results_summary .actions -->
+
+ <!-- COinS / Openurl -->
+ <span class="Z3988" title="[% itemsloo.coins %]"></span>
+ </td>
+ </tr>
+ [% END # / FOREACH itemsloop %]
+ </tbody>
+ </table> <!-- / #listcontents -->
+ </div><!-- / .searchresults -->
+
+ [% IF ( pagination_bar ) %]
+ <div class="pages">[% pagination_bar %]</div>
+ [% END %]
+
+ [% ELSE %]
+ <div id="toolbar" class="toolbar clearfix">
+ <div class="list-actions">
+ <a class="newshelf" href="/cgi-bin/koha/opac-shelves.pl?shelves=1">Tạo giá sách ảo</a> <span class="sep"></span>
+ [% IF ( manageshelf ) %]
+ <span class="sep">|</span>
+ <form method="get" action="/cgi-bin/koha/opac-shelves.pl" class="form-inline">
+ <input type="hidden" name="op" value="modif" />
+ <input type="hidden" name="display" value="viewshelf" />
+ <input type="hidden" name="shelfnumber" value="[% shelfnumber | html %]" />
+ <input class="editshelf" type="submit" value="Chỉnh sửa" />
+ </form>
+
+ <form method="post" action="/cgi-bin/koha/opac-shelves.pl" class="form-inline">
+ <input type="hidden" value="1" name="shelves"/>
+ <input type="hidden" value="1" name="DEL-[% shelfnumber | html  %]"/>
+ [% IF ( showprivateshelves ) %]
+ <input type="hidden" name="display" value="privateshelves"/>
+ [% END %]
+ <input type="submit" class="deleteshelf" value="Xóa giá sách" onclick="return confirmDelete(MSG_CONFIRM_DELETE_LIST);" />
+ </form>
+ [% END # / IF manageshelf %]
+ </div> <!-- / .list-actions -->
+ </div> <!-- / #toolbar -->
+
+ <div class="alert alert-info">
+ Hiện tại giá sách ảo không có tài liệu. [% IF Koha.Preference( 'opacuserlogin' ) == 1 %] Bạn có thể thực hiện <a href="opac-main.pl">tìm kiếm</a> để thêm tài liệu vào giá sách ảo.
+ [% END %]
+ </div>
+ [% END # / IF itemsloop %]
+ [% END # / IF viewshelf %]
+
+ [% IF ( itemsloop && allowremovingitems ) %]
+ <input type="hidden" name="shelfnumber" value="[% shelfnumber | html %]" />
+ <input type="hidden" name="modifyshelfcontents" value="1" />
+ <input type="hidden" name="viewshelf" value="[% shelfnumber | html %]" /><input id="remove-selected" class="btn btn-danger" type="submit" value="Loại bỏ tài liệu được chọn" />
+ </form>
+ [% ELSIF ( !itemsloop && manageshelf ) %]
+ <form method="post" action="opac-shelves.pl">
+ <input type="hidden" name="DEL-[% shelfnumber | html %]" value="1" />
+ <input type="hidden" name="shelves" value="1" />
+ <input type="hidden" name="shelfoff" value="[% shelfoff %]" />
+ <input onclick="return confirmDelete(MSG_CONFIRM_DELETE_LIST)" value="Xóa" type="submit" class="btn btn-danger" />
+ </form>
+ [% END %]
+
+ [% IF ( edit ) %]
+ <form method="post" action="/cgi-bin/koha/opac-shelves.pl">
+ <input type="hidden" name="op" value="modifsave" />
+ <input type="hidden" name="display" value="[% display %]" />
+ <input type="hidden" name="shelfnumber" value="[% shelfnumber | html %]" />
+ <fieldset class="rows">
+ <legend>Chỉnh sửa giá sách ảo: <em>[% shelfname |html %]</em></legend>
+ <ol>
+ <li><label for="shelfname">Tên giá sách ảo: </label><input type="text" id="shelfname" name="shelfname" maxlength="255" value="[% shelfname |html %]" /></li>
+ <li>
+ <li><label class="img" for="img">Ảnh giá sách</label><input type="file" name="img">
+ <span class="required">Bắt buộc</span>
+ </li>
+ <label for="sortfield" >Sắp xếp theo: </label>
+ <select name="sortfield" id="sortfield">
+ [% IF ( sortfield == "title" ) %]
+ <option value="title" selected="selected">Nhan đề</option>
+ [% ELSE %]
+ <option value="title">Nhan đề</option>
+ [% END %]
+ [% IF ( sortfield == "author" ) %]
+ <option value="author" selected="selected">Tác giả</option>
+ [% ELSE %]
+ <option value="author">Tác giả</option>
+ [% END %]
+ [% IF ( sortfield == "copyrightdate" ) %]
+ <option value="copyrightdate" selected="selected">Năm xuất bản</option>
+ [% ELSE %]
+ <option value="copyrightdate">Năm xuất bản</option>
+ [% END %]
+ [% IF ( sortfield == "itemcallnumber" ) %]
+ <option value="itemcallnumber" selected="selected">Ký hiệu phân loại</option>
+ [% ELSE %]
+ <option value="itemcallnumber">Ký hiệu phân loại</option>
+ [% END %]
+ </select>
+ </li>
+ [% IF ( OpacAllowPublicListCreation || category2 ) %]
+ <li>
+ <label for="category">Kiểu giá sách:</label>
+ <select name="category" id="category">
+ [% IF ( category1 ) %]
+ <option value="1" selected="selected">Cá nhân</option>
+ [% ELSE %]
+ <option value="1">Cá nhân</option>
+ [% END %]
+ [% IF ( category2 ) %]
+ <option value="2" selected="selected">Cộng đồng</option>
+ [% ELSE %]
+ <option value="2">Cộng đồng</option>
+ [% END %]
+ </select>
+ [% IF ( category2 && !OpacAllowPublicListCreation ) %]
+ <span class="hint alert alert-info">Thư viện của bạn không kích hoạt tính năng giá sách ảo cộng đồng. Nếu bạn chuyển giá sách ảo của bạn thành giá sách ảo cá nhân, bạn sẽ không thể chuyển đổi ngược lại.</span>
+ [% END %]
+ </li>
+ [% INCLUDE list_permissions %]
+ [% END %]
+ </ol>
+ [% UNLESS ( OpacAllowPublicListCreation || category2 ) %]
+ <input type="hidden" name="category" value="1" />
+ [% END %]
+ </fieldset>
+
+ <fieldset class="action">
+ <input class="btn" type="submit" value="Lưu" />
+ [% IF ( showprivateshelves ) %]
+ <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl?shelfnumber=[% shelfnumber | html %]&amp;display=privateshelves">Hủy bỏ</a>
+ [% ELSE %]
+ <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl?shelfnumber=[% shelfnumber | html %]">Hủy bỏ</a>
+ [% END %]
+ </fieldset>
+ </form>
+ [% END # / IF edit %]
+
+
+ [% UNLESS ( edit ) %]
+ [% UNLESS ( viewshelf ) %]
+ [% UNLESS ( shelves ) %]
+ <h2>Giá sách ảo</h2>
+ <div class="toptabs ui-tabs ui-widget ui-widget-content ui-corner-all">
+ <ul class="ui-tabs-nav ui-helper-reset ui-helper-clearfix ui-widget-header ui-corner-all">
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ [% IF ( showprivateshelves ) %]
+ <li id="privateshelves_tab" class="ui-state-default ui-corner-top ui-tabs-active ui-state-active"><a class="ui-tabs-anchor" href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Giá sách cá nhân </a></li>
+ [% ELSE %]
+ <li id="privateshelves_tab" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves">Giá sách cá nhân </a></li>
+ [% END %]
+ [% END %]
+ [% IF ( showpublicshelves ) %]
+ <li id="publicshelves_tab" class="ui-state-default ui-corner-top ui-tabs-active ui-state-active"><a class="ui-tabs-anchor" href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Giá sách cộng đồng</a></li>
+ [% ELSE %]
+ <li id="publicshelves_tab" class="ui-state-default ui-corner-top"><a class="ui-tabs-anchor" href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves">Giá sách cộng đồng</a></li>
+ [% END %]
+ </ul>
+
+ [% IF ( showprivateshelves ) %]
+ <div id="privateshelves" class="ui-tabs-panel ui-widget-content ui-corner-bottom" style="display:block;">
+
+ [% IF ( loggedinusername ) %]
+ <div id="toolbar" class="toolbar"><a class="newshelf" href="/cgi-bin/koha/opac-shelves.pl?shelves=1">Tạo giá sách ảo</a></div>
+ [% IF ( showprivateshelves ) %]
+ [% IF ( shelveslooppriv ) %]
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Tên giá sách ảo:</th>
+ <th>Nội dung</th>
+ <th>Kiểu giá sách</th>
+ <th>&nbsp;</th>
+ </tr>
+ </thead>
+ <tbody>
+ [% FOREACH shelveslooppri IN shelveslooppriv %]
+ <tr>
+ <td><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves&amp;viewshelf=[% shelveslooppri.shelf %]&amp;sortfield=[% shelveslooppri.sortfield %]">[% shelveslooppri.shelfname |html %]</a></td>
+ <td>[% IF ( shelveslooppri.count ) %]Hiện tại có [% shelveslooppri.count %] [% IF ( shelveslooppri.single ) %]tài liệu trong giá sách ảo[% ELSE %]tài liệu trong giá sách ảo[% END %][% ELSE %]Giá sách ảo không có tài liệu[% END %]</td>
+ <td>
+ [% IF ( shelveslooppri.viewcategory1 ) %][% IF !shelveslooppri.shares %]Cá nhân[% ELSE %]Được chia sẻ[% END %][% END %]
+ </td>
+ <td>
+ [% IF ( shelveslooppri.mine ) %]
+ <form action="/cgi-bin/koha/opac-shelves.pl" method="get" class="form-inline">
+ <input type="hidden" name="shelfnumber" value="[% shelveslooppri.shelf |html %]" />
+ <input type="hidden" name="display" value="privateshelves" />
+ <input type="hidden" name="op" value="modif" />
+ <input value="Chỉnh sửa" type="submit" class="editshelf" />
+ </form>
+ <form action="opac-shelves.pl" method="post" class="form-inline">
+ <input type="hidden" name="shelves" value="1" />
+ <input type="hidden" name="display" value="privateshelves" />
+ <input type="hidden" name="DEL-[% shelveslooppri.shelf |html %]" value="1" />
+ <input type="hidden" name="shelfoff" value="[% shelfoff |html %]" />
+ [% IF ( shelveslooppri.confirm ) %]
+ <input type="hidden" name="CONFIRM-[% shelveslooppri.confirm |html %]" value="1" />
+ <input class="btn btn-danger confirm" type="submit" value="Xác nhận" />
+ [% ELSE %]
+ <input onclick="return confirmDelete(MSG_CONFIRM_DELETE_LIST);" value="Xóa" class="deleteshelf" type="submit" />
+ [% END %]
+ </form>
+ [% IF Koha.Preference('OpacAllowSharingPrivateLists') %]
+ <a href="/cgi-bin/koha/opac-shareshelf.pl?op=invite&shelfnumber=[% shelveslooppri.shelf |html %]" class="">Chia sẻ</a>
+ [% END %]
+ [% ELSE # not shelveslooppri.mine, so shared %]
+ [% INCLUDE remove_share  # if pref is off, you should still be able to remove shares %]
+ <input type="hidden" name="shelfoff" value="[% shelfoff |html %]" />
+ <input type="hidden" name="REMSHR-[% shelveslooppri.shelf |html %]" value="1" />
+ </form>
+ [% END %]&nbsp;
+ </td>
+ </tr>
+ [% END # / FOREACH shelveslooppri %]
+ </tbody>
+ </table>
+ <div class="pages">[% pagination_bar %]</div>
+ [% ELSE %]
+ <p>Không có giá sách ảo cá nhận.</p>
+ [% END # / IF shelveslooppriv %]
+ [% END # / IF showprivateshelves %]
+ [% ELSE %]
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ <div class="alert alert-info"><a href="/cgi-bin/koha/opac-user.pl">Đăng nhập để</a> tạo giá sách mới.</div>
+ [% END %]
+ [% END  # IF loggedinusername %]
+ </div><!-- / #privateshelves -->
+ [% END # / IF showprivateshelves %]
+ [% IF ( showpublicshelves ) %]
+ <div id="publicshelves" class="ui-tabs-panel ui-widget-content ui-corner-bottom" style="display:block;">
+
+ [% IF ( loggedinusername ) %]
+ <div id="toolbar" class="toolbar"> <a class="newshelf" href="/cgi-bin/koha/opac-shelves.pl?shelves=1">Tạo giá sách ảo</a></div>
+ [% ELSE %]
+ [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+ <div class="alert alert-info"><a href="/cgi-bin/koha/opac-user.pl">Đăng nhập để</a> tạo giá sách mới.</div>
+ [% END %]
+ [% END # / IF loggedinusername %]
+
+ [% IF ( shelvesloop ) %]
+ <table class="table">
+ <thead>
+ <tr>
+ <th>Tên giá sách</th>
+ <th>Nội dung</th>
+ <th>Kiểu giá sách</th><th>&nbsp;</th>
+ </tr>
+ </thead>
+ <tbody>
+ [% FOREACH shelvesloo IN shelvesloop %]
+ <tr>
+ <td><a class="title" href="/cgi-bin/koha/opac-shelves.pl?viewshelf=[% shelvesloo.shelf %]&amp;sortfield=[% shelvesloo.sortfield %]">[% shelvesloo.shelfname |html %]</a></td>
+ <td>Hiện tại có [% shelvesloo.count %] [% IF ( shelvesloo.single ) %] tài liệu[% ELSE %]tài liệu[% END %]trong giá sách ảo </td>
+ <td>
+ [% IF ( shelvesloo.viewcategory2 ) %]Cộng đồng[% END %]
+ </td>
+ <td>
+ [% IF ( shelvesloo.mine ) %]
+ <form action="/cgi-bin/koha/opac-shelves.pl" method="get" class="form-inline">
+ <input type="hidden" name="shelfnumber" value="[% shelvesloo.shelf %]" />
+ <input type="hidden" name="op" value="modif" />
+ <input type="hidden" name="display" value="publicshelves" />
+ <input value="Chỉnh sửa" type="submit" class="editshelf" />
+ </form>
+ <form action="opac-shelves.pl" method="post" class="form-inline">
+ <input type="hidden" name="shelves" value="1" />
+ <input type="hidden" name="DEL-[% shelvesloo.shelf %]" value="1" />
+ [% IF ( shelvesloo.confirm ) %]
+ <input type="hidden" name="CONFIRM-[% shelvesloo.confirm %]" value="1" />
+ <input value="Xác nhận" type="submit" class="btn btn-danger confirm" />
+ [% ELSE %]
+ <input type="submit" class="deleteshelf" onclick="return confirmDelete(MSG_CONFIRM_DELETE_LIST);" value="Xóa" />
+ [% END %]
+ </form>
+ [% END %]&nbsp;
+ </td>
+ </tr>
+ [% END # / FOREACH shelvesloop %]
+ </tbody>
+ </table>
+ [% IF ( pagination_bar ) %]<div class="pages">[% pagination_bar %]</div>[% END %]
+ [% ELSE %]
+ [% IF ( showpublicshelves ) %]<p>Không có giá sách ảo cộng đồng.</p>[% END %]
+ [% END # / IF shelvesloop %]
+
+ </div><!-- / # publicshelves -->
+ [% END # / IF showprivateshelves %]
+ </div> <!-- / .ui-tabs-panel -->
+ [% END # / UNLESS shelves %]
+ [% END # / UNLESS viewshelf %]
+ [% END # / UNLESS edit %]
+
+ [% IF ( shelves ) %]
+ <div id="addshelf">
+ <form method="post" action="/cgi-bin/koha/opac-shelves.pl">
+ <fieldset class="rows">
+ <legend>Tạo giá sách ảo</legend>
+ <input type="hidden" name="shelves" value="1" />
+ <ol>
+ <li>
+ <label class="required" for="addshelf">Tên giá sách ảo:</label>
+ [% IF ( already ) %]
+ <input id="addshelf" type="text" name="addshelf" value="[% already %]" maxlength="255" class="input-fluid" />
+ [% ELSE %]
+ <input id="addshelf" type="text" name="addshelf" maxlength="255" class="input-fluid" />
+ [% END %]
+ <input type="hidden" name="owner" id="owner" value="[% loggedinuser %]" />
+ </li>
+ <li><label class="img" for="img">Ảnh giá sách</label><input type="file" name="img">
+ <span class="required">Bắt buộc</span>
+ </li>
+ <li>
+ <label for="sortfield" >Sắp xếp theo: </label>
+ <select name="sortfield" id="sortfield">
+ <option value="title">Nhan đề</option>
+ <option value="author">Tác giả</option>
+ <option value="copyrightdate">Năm xuất bản</option>
+ <option value="itemcallnumber">Ký hiệu phân loại</option>
+ </select>
+ </li>
+ [% IF (OpacAllowPublicListCreation) %]
+ <li>
+ <label for="category">Kiểu giá sách:</label>
+ <select name="category" id="category">
+ <option value="1">Cá nhân</option>
+ <option value="2">Cộng đồng</option>
+ </select>
+ </li>
+ [% INCLUDE list_permissions %]
+ [% END %]
+ </ol>
+ [% UNLESS (OpacAllowPublicListCreation) %]
+ <input type="hidden" name="category" value="1" />
+ [% END %]
+ </fieldset>
+ <fieldset class="action">
+ <input value="Lưu" onclick="Check(this.form); return false;" class="btn" type="submit" />
+ <a class="cancel" href="/cgi-bin/koha/opac-shelves.pl">Hủy bỏ</a>
+ </fieldset>
+ </form>
+ </div> <!-- / #addshelf -->
+ [% END # / IF shelves %]
+
+ </div> <!-- / #usershelves -->
+ </div> <!-- / .span10/12 -->
+ </div> <!-- / .row-fluid -->
+ </div> <!-- / .container-fluid -->
+ </div> <!-- / .main -->
+
+<div class="modal hide" id="modalWin" role="dialog" aria-hidden="true" tabindex="-1">
+ <div class="modal-content">
+ <div class="modal-body">
+ <div style="margin:1em;padding:1em;font-size:150%;">
+ <img src="[% interface %]/[% theme %]/images/loading.gif" /> Loading
+ </div>
+ </div>
+ </div>
+</div>
+
+<!-- DEBUG -->
+ <div id="debug"></div>
+<!-- /DEBUG -->
+
+[% INCLUDE 'opac-bottom.inc' %]
+[% BLOCK jsinclude %]
+<script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/plugins/jquery.checkboxes.min.js"></script>
+<script type="text/javascript">
+//<![CDATA[
+var MSG_REMOVE_FROM_LIST = _("Bạn chắc chắn muốn loại bỏ các tài liệu này khỏi giá sách ảo?");
+var MSG_REMOVE_ONE_FROM_LIST = _("Bạn chắc chắn muốn loại bỏ tài liệu này khỏi giá sách ảo?");
+var MSG_CONFIRM_DELETE_LIST = _("Bạn chắc chắn muốn xóa giá sách ảo này?");
+var MSG_CONFIRM_REMOVE_SHARE = _("Bạn chắc chắn muốn loại bỏ chia sẻ này?");
+
+[% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'RequestOnOpac' ) == 1 ) ) %]
+    function holdSelections() {
+        var checkedBoxes = $("input:checkbox:checked");
+        if ($(checkedBoxes).size() == 0) {
+            alert(MSG_NO_RECORD_SELECTED);
+        } else {
+            var bibs = "";
+            $(checkedBoxes).each(function(){
+                var name = $(this).attr("name");
+                bib = name.substr(4);
+                bibs += bib + "/";
+            });
+            document.location = "/cgi-bin/koha/opac-reserve.pl?biblionumbers="+bibs;
+        }
+    }
+[% END %]
+[% IF ( TagsInputEnabled && loggedinusername ) %]
+    function tagSelected() {
+        var checkedBoxes = $("input:checkbox:checked");
+        if ($(checkedBoxes).size()) {
+            $("#tagsel_tag").hide();
+            $(".tag_hides").hide();
+            $("#tagsel_form").show();
+        } else {
+            alert(MSG_NO_RECORD_SELECTED);
+        }
+    }
+
+    function tagCanceled() {
+        $("#tagsel_form").hide();
+        $("#tagsel_tag").show();
+        $(".tag_hides").show();
+        $("#tagsel_new").val("");
+        $(".tagstatus").empty().hide();
+    }
+
+    function tagAdded() {
+        var checkedBoxes = $("input:checkbox:checked");
+        if (!$(checkedBoxes).size()) {
+            alert(MSG_NO_RECORD_SELECTED);
+            return false;
+        }
+
+        var tag = $("#tagsel_new").val();
+        if (!tag || (tag == "")) {
+            alert(MSG_NO_TAG_SPECIFIED);
+            return false;
+        }
+
+        var bibs = [];
+        for (var i = 0; i < $(checkedBoxes).size(); i++) {
+            var box = $(checkedBoxes).get(i);
+            bibs[i] = $(box).val();
+        }
+
+        KOHA.Tags.add_multitags_button(bibs, tag);
+        return false;
+    }
+[% END %]
+
+function enableCheckboxActions(){
+    // Enable/disable controls if checkboxes are checked
+    var checkedBoxes = $(".checkboxed input:checkbox:checked");
+    if ($(checkedBoxes).size()) {
+      $("#selections").html(_("Với nhan đề được chọn: "));
+      $("#selections-toolbar .links a").removeClass("disabled");
+    } else {
+      $("#selections").html(_("Chọn nhan đề để: "));
+      $("#selections-toolbar .links a").addClass("disabled");
+    }
+}
+
+$(function() {
+    [% IF Koha.Preference( 'opacbookbag' ) == 1 %]$(".addtocart,.cartRemove").removeClass("hidden");[% END %]
+    $("span.clearall").html("<a id=\"CheckNone\" href=\"#\">"+_("Bỏ tất cả")+"<\/a>");
+    $("span.checkall").html("<a id=\"CheckAll\" href=\"#\">"+_("Chọn tất cả")+"<\/a>");
+    $("a.print").show();
+
+    [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'RequestOnOpac' ) == 1 ) ) %]
+        $("#placehold").html("<a href=\"#\" class=\"hold tag_hides disabled\">"+_("Đặt mượn")+"<\/a>");
+        $("#selections-toolbar a.hold").click(function(){
+            holdSelections();
+            return false;
+        });
+    [% END %]
+
+    // If JS is enabled add paramter to download link
+    var dialoglink = $(".download").attr("href");
+    dialoglink += "&context=modal";
+    $(".download").attr("href",dialoglink);
+
+    $("#CheckAll").click(function(){
+        $(".checkboxed").checkCheckboxes();
+        enableCheckboxActions();
+        return false;
+    });
+    $("#CheckNone").click(function(){
+        $(".checkboxed").unCheckCheckboxes();
+        enableCheckboxActions();
+        return false;
+    });
+
+    $(".cb").click(function(){
+      enableCheckboxActions();
+    });
+    enableCheckboxActions();
+
+    [% IF ( TagsInputEnabled && loggedinusername ) %]
+        var tagAdd = $(".tag_add");
+        tagAdd.removeClass("hidden");
+        $("#tagsel_tag").click(function(){
+            tagSelected();
+            return false;
+        });
+        $("#tagsel_cancel").click(function(){
+            tagCanceled();
+            return false;
+        });
+        $("#tagsel_button").click(function(){
+            tagAdded();
+            return false;
+        });
+
+        tagAdd.click(function(){
+            var thisid = $(this).attr("id");
+            thisid = thisid.replace("tag_add","");
+            $(this).hide();
+            $("#tagform"+thisid).show();
+            $("#newtag"+thisid).focus();
+            $("#newtag"+thisid+"_status").empty().hide();
+            return false;
+        });
+        $(".cancel_tag_add").click(function(){
+            var thisid = $(this).attr("id");
+            thisid = thisid.replace("cancel","");
+            $("#tagform"+thisid).hide();
+            $("#tag_add"+thisid).show();
+            $("#newtag"+thisid).val("");
+            $("#newtag"+thisid+"_status").empty().hide();
+            return false;
+        });
+        $(".tagbutton").click(function(){
+          var thisid = $(this).attr("title");
+          var tag = $("#newtag"+thisid).val();
+          if (!tag || (tag == "")) {
+              alert(MSG_NO_TAG_SPECIFIED);
+              return false;
+          }
+          KOHA.Tags.add_tag_button(thisid, tag);
+          return false;
+        });
+    [% END %]
+
+    [% IF ( loggedinusername && allowremovingitems ) %]
+        var removeFromListLinks = $(".removefromlist");
+        removeFromListLinks.removeClass("hidden");
+        // "remove from list" appearing on each line of the list output
+        removeFromListLinks.on("click",function(){
+            $(".checkboxed").unCheckCheckboxes();
+            var listitem = $("input[name="+this.id+"]");
+            listitem.prop("checked",true);
+            $("#myform").submit();
+        });
+
+        $("#myform").submit(function(){
+            var checkedBoxes = $(".checkboxed input:checkbox:checked");
+            var numchecked = $(checkedBoxes).size();
+            if (numchecked) {
+                if( numchecked > 1 ){
+                    return confirmDelete(MSG_REMOVE_FROM_LIST);
+                } else {
+                    return confirmDelete(MSG_REMOVE_ONE_FROM_LIST);
+                }
+            } else {
+                alert(MSG_NO_RECORD_SELECTED);
+                return false;
+            }
+        });
+        $("#removeitems").html("<a href=\"#\" class=\"removeitems tag_hides disabled\">"+_("Loại bỏ")+"</a>")
+        .click(function(){
+            $("#myform").submit();
+            return false;
+        });
+    [% END %]
+    [% IF OpenLibraryCovers %]KOHA.OpenLibrary.GetCoverFromIsbn();[% END %]
+    [% IF OPACLocalCoverImages %]KOHA.LocalCover.GetCoverFromBibnumber(false);[% END %]
+    [% IF ( GoogleJackets ) %]KOHA.Google.GetCoverFromIsbn();[% END %]
+    $('#sort-submit').hide();
+}); // document.ready
+
+function Check(f) {
+    var _alertString="";
+    var alertString2;
+
+    if(f.addshelf.value.length ==0){
+        _alertString += _("- Bạn phải nhập tên giá sách ảo") + "\n";
+    }
+
+    if (_alertString.length==0) {
+        f.submit();
+    } else {
+        alertString2 = _("Mẫu khai báo không được gửi đi, phát hiện các lỗi sau đây:");
+        alertString2 += "\n------------------------------------------------------------------------------------\n\n";
+        alertString2 += _alertString;
+        alert(alertString2);
+    }
+}
+//]]>
+</script>
+[% END %]

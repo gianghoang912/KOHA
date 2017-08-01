@@ -62,4 +62,6 @@
 <script type="text/javascript" src="[% themelang %]/lib/owl-carousel/jquery.totemticker.js"></script>
 
 <link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/css/dl/dl.style.css" />
+<link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/css/dl/dl.responsive.style.css" />
+<link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/css/dl/dl.bootstrapGridSystem.style.css" />
 <script type="text/javascript" src="[% interface %]/[% theme %]/lib/jquery/jquery-ui.js"></script>

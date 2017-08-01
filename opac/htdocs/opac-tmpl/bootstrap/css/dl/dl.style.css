@@ -1,42 +1,90 @@
-/*Edit by huythuan.vo@dlcorp.com.vn*/
+/*Edit by giang.hoang@dlcorp.com.vn*/
 body{
 	padding:0px;
 	background:#f9f9f9;
 	font-family:Helvetica, Arial, sans-serif;
 }
-.main-footer .info-dl {margin-left:-50px}
-@media (min-width: 1200px)
-{
-.info-dl {margin-left:-50px}
+*{
+	box-sizing: border-box;
 }
-@media (min-width: 1040px) {
-	
-	.main{
-		width:1036px;
-		margin:0px auto;
-		border-radius:0px;
-		border:0px;
-	}
-	.main-footer{
-		width:1036px;
-		margin:0px auto;
-		border-radius:0px;
-		border:0px;
-	}
-	.intersite{
-		width:1036px;
-		margin:0px auto;
-	}
-	.header-main{
-		width:1036px;
 
-	}
-	.header-content{
-		padding-left:0px;
-		padding-right:0px;
-	}
-	
+#wrap>.navbar{
+	margin-bottom:0;
 }
+.navbar-inner{
+	border: 0px;
+	box-shadow: none;
+	border-radius: 0px;
+	background: none;
+	padding: 0px;
+}
+
+#cartmenuitem{
+	color:#15a1b1;
+}
+#site-name {margin-top:45px; color:#fff; font-family: "Times New Roman",Times,serif; width:200px;}
+
+.header-banner{
+	margin:0px auto;
+}
+
+.header-main{
+	margin:0px auto;
+	background:#004e96;
+}
+
+.navbar-inverse .navbar-inner{
+	background:none;
+	border-bottom:none;
+	box-shadow:none;
+}
+
+#logo{
+	width:170px;
+	height:52px;
+	background-image: url("../../images/dl/logokoha.png");
+	background-size:cover;
+	margin:10px 0px 10px -10px;
+}
+
+.container-fluid{
+	padding:0 !important;
+}
+
+#logo a {
+
+	overflow:inherit;
+	padding: 50px 0px;
+}
+
+.navbar-static-top .navbar-inner .header-content a{
+	color:white;
+	font:inherit;
+}
+.navbar-static-top .navbar-inner .header-content a .title{
+	padding-top:7px;
+}
+.navbar-static-top .navbar-inner .header-content ul li{
+	padding-left:10px;
+	padding-right:10px;
+	margin-top:10px;
+	background:transparent;
+	opacity:0.6;
+}
+.navbar-static-top .navbar-inner .header-content ul li:hover{
+	opacity:1;
+}
+
+.links-menu{
+	margin-right:8px;
+}
+
+.header-search{
+	background-color: #f5f5f5;
+	border-bottom: thin solid #dddddd;
+}
+
+.main-footer .info-dl {margin-left:-50px}
 
 .intersite-nav{
 	padding:8px 0px;
@@ -54,134 +102,62 @@ body{
 	margin:0px;
 	list-style:none;
 	margin:0px 6px;
-	
+
 }
 .intersite-nav ul li a{
-	  display: inline-block;
-	  text-decoration:none;
-	  color:#007236;
-	  font-weight:500;
-	  
-}
-
-.header{
-	background:#1876cc;
-	margin:0px auto;
-}
-
-.header-main{
-	background:transparent url("../../images/dl/banner.jpg");
-	margin:0px auto;
-}
-
-.navbar-inverse .navbar-inner{
-	background:none;
-	border-bottom:none;
-	box-shadow:none;
-}
-#logo{
-	background-image: url("../../images/dl/logokoha.png");
-}
-
-.container-fluid{
-	padding-left:0px;
-	padding-right:0px;
-}
-
-#logo {
-		
-		margin:15px 0px 0px -10px
-}
-#site-name {margin-top:45px; color:#fff; font-family: "Times New Roman",Times,serif; width:200px;}
-#logo a {
-		
-		overflow:inherit;
-		padding: 50px 0px;
-}
-
-@media only screen and (max-width: 600px){
-	#logo {
-		background: transparent url("../../images/dl/home.png") no-repeat;
-		margin: 14px 14px 14px 14px;
-		width: 32px;
-	}
-	#logo a{
-		padding: 16px 0px;
-		width: 32px;
-	}
-	#site-name {display:none;}
-	
-	
-	.dvitem{
-		width:100%;
-		margin-left:0px;
-	}
-		
-	
+	display: inline-block;
+	text-decoration:none;
+	color:#007236;
+	font-weight:500;
 }
 
 
-	
-
-.navbar-static-top .navbar-inner .header-content a{
-	color:white;
-	font:inherit;
-}
-.navbar-static-top .navbar-inner .header-content a .title{
-	padding-top:10px;
-}
-.navbar-static-top .navbar-inner .header-content ul li{
-	padding-left:10px;
-	padding-right:10px;
-	margin-top:10px;
-	background:transparent;
-	opacity:0.6;
-}
-.navbar-static-top .navbar-inner .header-content ul li:hover{
-	opacity:1;
-}
 .main-search-menu{
 
 }
 .main-search{
 	width:100%;
-	margin-left:15px;
 	padding-top:20px;
 	padding-bottom:20px;
 }
 
 #searchsubmit{
-	width:40px;
-	height:32px;
-	background:transparent url("../../images/dl/search.png") no-repeat;
+	height:38px;
 	border:none;
-	margin-left:10px;
+	background:#e52225;
+	border-radius: 0 5px 5px 0;
+	color:#ffffff;
+	padding:5px 10px;
 }
 .input-append{
 	width:90%;
 }
 
 #masthead_search{
-	height: 34px !important;
-	border-radius: 0px;
+	height: 38px !important;
+	border-radius: 5px 0px 0px 5px;
+	color:#333333;
+	margin-left:10px;
 }
 #translControl1{
 	margin: 0px;
-	border-radius: 0px;
 	box-shadow: none;
-	height: 24px !important;
-	width:56%;
+	height: 38px !important;
+	border-radius: unset !important;
 }
 .input-append {
-	display:flex !important; 
-	font-size:14px;	
+	display:flex !important;
+	font-size:14px;
 	width:100%;
 }
 .input-append ul.ul1 li.li1 a.menu-duoi{
 	padding:17px 16px;
 	background:transparent url("../../images/dl/sourcelist.png") no-repeat;
+	background-size:cover;
+	height:38px;
 	border:none;
-	margin-left:10px;
+	margin-left:15px;
+	width:40px;
 	display:block;
 }
 .input-append ul.ul1 li.li1 a.menu-cart{
@@ -197,8 +173,8 @@ body{
 	padding:0px;
 	list-style:none;
 	width:auto;
-	
-	
+
+
 }
 .input-append > ul.ul1 > li.li1{
 	margin:0px;
@@ -215,7 +191,7 @@ body{
 .input-append > ul.ul1 > li.last > ul{
 	position:absolute;
 	right:-10px;
-	
+
 }
 .input-append > ul.ul1 > li.li1 a{
 	text-decoration:none;
@@ -232,22 +208,24 @@ body{
 	right:0px;
 }
 .input-append > ul.ul1 > li.li1 > ul > li{
-	background:#012d98;
 	border-top:1px solid #fff;
 	padding-left:10px;
 	padding-right:10px;
 	list-style:none;
-	
+
 }
 .input-append > ul.ul1 > li.li1 > ul > li > a{
 	padding:10px;
 	border:none;
 	margin-left:10px;
-	
+	background:#edf5fa;
+	color:#004e96;
 	display:block;
+	font-weight:bold;
 }
-.input-append > ul.ul1 > li.li1 > a:hover{
-	
+.input-append > ul.ul1 > li.li1 > ul > li > a:hover{
+	background: #004e96;
+	color:#ffffff;
 }
 .input-append ul.ul1  li.li1:hover ul{
 	display:block;
@@ -282,72 +260,6 @@ body{
 	background:transparent url("../../images/dl/list.png") no-repeat;
 }
 
-@media (max-width: 901px){
-	.main-search ul{
-		display:none;
-	}
-	.navbar .btn-user, .navbar .btn-cart, .navbar .btn-list{
-		display:block;
-	}
-}
-@media (max-width: 901px){
-	.main-search ul.ul1{
-		display:none;
-	}
-	.main-search{
-		padding-top:10px;
-		padding-bottom:10px;
-	}
-	#logo {
-		margin: 14px 28px;
-	}
-}
-
-@media (min-width: 901px){
-	.nav-collapse.collapse.navbar-responsive-cast{
-		height:0px !important;
-		overflow:hidden !important;
-	}
-	.nav-collapse.collapse.navbar-responsive-user{
-		height:0px !important;
-		overflow:hidden !important;
-	}
-}
-
-@media (max-width: 901px){
-	.navbar-static-top .navbar-inner .header-content a .links-menu{
-		display:none;
-	}
-	.navbar-static-top .navbar-inner .header-content a .title{
-		padding:0px;
-		margin:0px;
-		text-align:left;
-	}
-	
-	.navbar-static-top .navbar-inner .header-content  li{
-		margin-top:0px !important;
-		background-color:#5ebf8a;
-		margin-bottom:0px;
-		border-radius:0px;
-		border-top:1px solid #50cd89;
-	}
-	.nav-collapse .nav > li > a{
-		margin-bottom:0px;
-		color:white !important;
-	}
-	.nav-collapse .nav > li > a:hover{
-		border-radius:0px;
-		background-color:#68f1a6 !important;
-	}
-	.nav-collapse .nav{
-		margin-bottom:0px;
-	}
-	.nav.pull-right.cls-mobi{
-		display:block !important;
-	}
-	
-}
-
 .navbar-inverse .btn-navbar:hover{
 	background-color:transparent !important;
 }
@@ -361,7 +273,7 @@ body{
 
 
 .span12.footer{
-	background:#ececec;	
+	background:#ececec;
 	display:inline-block;
 	padding-bottom:10px;
 }
@@ -377,7 +289,7 @@ body{
 .menu-bottom{
 	float:right !important;
 	margin-top:10px;
-	
+
 }
 
 #content-bottom{
@@ -390,11 +302,11 @@ body{
 	display:block;
 	float:left;
 }
- .menu-bt3{
- 	width:20%;
+.menu-bt3{
+	width:20%;
 	display:block;
 	float:left;
- }
+}
 .menu-bt1 a, .menu-bt2 a{
 	display:block;
 	color:#159eae;
@@ -410,46 +322,13 @@ body{
 .main .container-fluid{
 	padding:10px;
 }
-@media (max-width: 767px){
-	
-	.main-footer .info-dl {
 
-    margin-left: 0px;
-}
-.main-footer .info-dl p {
-	padding-right:40px;
-}
-	.info-dl{
-		border-bottom:1px solid #c2c2c2;
-		border-right:none;
-		margin-top:10px;padding-left:20px
-	}
-	.main{
-		padding:0px;
-		border:0px;
-		margin:0px;
-		border-radius:0px;
-	}
-
-	
-}
-@media (min-width: 768px){
-
-	.main{
-		margin:0px auto;
-		border-radius:0px;
-		border:0px;
-	}
-	.span10.maincontent{
-		margin-left:15px;
-	}
-}
 .main{
-		margin:0px auto;
-		border-radius:0px;
-		border:0px;
-	}
-
+	margin:20px auto 0;
+	border:none !important;
+	border-radius: unset !important;
+	box-shadow: none !important;
+}
 
 .footer-dl{
 	background:#1876cc;
@@ -479,11 +358,11 @@ body{
 
 #top-pages .pagination{
 	margin-top: 0;
-  	margin-bottom: 10px;
+	margin-bottom: 10px;
 }
 
 
-/* b? sýu t?p n?i b?t*/
+/* b? sï¿½u t?p n?i b?t*/
 
 .bst h3, .sk h3{
 	color:#1f6eef;
@@ -498,7 +377,7 @@ body{
 .bst .bst-ct .item img{
 	width:100%;
 	height:100%;
-} 
+}
 .bst .bst-ct{
 	width:100%;
 	height:100%;
@@ -517,12 +396,12 @@ body{
 }
 .sk-item h5{
 	height: 20px;
-  overflow: hidden;
+	overflow: hidden;
 }
 .sk-item{
 	width:80%;
 	float:right;
-	
+
 }
 
 .img-sk{
@@ -542,11 +421,11 @@ body{
 	background:white;
 	color:black;
 	margin:0px;
-		text-align:center;
+	text-align:center;
 }
 
 
-/*sách m?i*/
+/*sï¿½ch m?i*/
 
 .newbook{
 	width:100%;
@@ -564,7 +443,7 @@ body{
 .titlesm, .titlebst, .titledv{
 	display:flex;
 	margin-left:20px;
-	padding-top:20px;	
+	padding-top:20px;
 }
 .titlesm h3, .titlebst h3, .titledv h3{
 	margin:0px;
@@ -591,7 +470,7 @@ body{
 #owl-sachmoi .item .img-book{
 	width:100px;
 	height:145px;
-	
+
 }
 #owl-sachmoi .item .img-book a img{
 	width:100px;
@@ -607,8 +486,8 @@ body{
 	padding-left:5px;
 	padding-right:5px;
 	overflow: hidden;
-	
-	
+
+
 }
 #owl-sachmoi .item .title-book a{
 	text-decoration:none;
@@ -616,7 +495,7 @@ body{
 
 .owl-buttons{
 	position:relative;
-	
+
 }
 .owl-theme .owl-controls .owl-buttons div.owl-prev{
 	position:absolute;
@@ -666,7 +545,7 @@ p.ncbsearch{
 	color:#159eae !important;
 	font-size:14px;
 	font-weight:bold;
-	
+
 }
 #gmc td{
 	padding-top:10px;
@@ -692,7 +571,7 @@ p.ncbsearch{
 
 .tt-ct{
 	width:100%;
-	
+
 }
 
 .tt-item h5{
@@ -702,8 +581,8 @@ p.ncbsearch{
 .tt-item{
 	width:80%;
 	float:right;
-	
-	
+
+
 }
 
 .tt-ct {
@@ -729,18 +608,18 @@ p.ncbsearch{
 	margin:0px;
 	padding-bottom:0px;
 	padding:10px;
-	
+
 }
 .breadcrumb li a{
 	text-decoration:none;
 	font-size:13px;
 }
 
-/* D?ch v? thý vi?n */
+/* D?ch v? thï¿½ vi?n */
 
 .dvtv{
 	display:inline;
-	
+
 }
 .dvitem{
 	width:47%;
@@ -752,7 +631,7 @@ p.ncbsearch{
 
 .dvitem a{
 	overflow:hidden;
-	
+
 }
 .dvitem h4{
 	margin-top:0px;
@@ -780,32 +659,10 @@ p.ncbsearch{
 	width:100%;
 	overflow:hidden;
 }
- .sk-ttt{
+.sk-ttt{
 	height:60px;
 	overflow:hidden;
- }
-
-@media only screen and (max-width: 600px){
-	
-	.dvitem{
-		width:100%;
-		margin-left:0px;
-	}
-	.dvitem .imgdv{
-		width:20%;
-		float:left;
-	}
-	
-	.dvitem .dv{
-		width:80%;
-		float:left;
-		
-	}
-.info-dl { padding-left:20px; text-align:center;}
-.info-dl p {font-size:15px; text-align:center;}
-	
 }
-
 
 .tab-content{
 	border-bottom:0px !important;
@@ -820,10 +677,10 @@ p.ncbsearch{
 	height:70px;
 	overflow: hidden;
 }
- 
+
 .modal{
 	border-radius:0px;
-	
+
 	display:auto;
 }
 
@@ -843,24 +700,11 @@ p.ncbsearch{
 	color:white;
 }
 #usermenu #menu ul li a:hover { color:#000; background:#fff;}
-#masthead_search{
-	
-	background:#012d98;
-	color:#fff;
-	font-weight:bold;
-	width: 300px;
-	margin-left:10px;
-}
-
-.input-append > ul.ul1 > li.li1 > ul > li > a{
-	color:white;
-	
-}
 
 .thoigian{
 	border: 1px solid grey;
-	
+
 }
 .suggestion{
-text-align: center;
+	text-align: center;
 }

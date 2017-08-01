@@ -6,7 +6,7 @@
 [% INCLUDE 'masthead.inc' %]
 
 
-<div class="main">
+<div class="main container">
  <ul class="breadcrumb">
  <li><a href="/cgi-bin/koha/opac-main.pl">Trang chủ</a><span class="divider">›</span></li>
  <li><a href="/cgi-bin/koha/opac-nc.pl">Nghiên cứu</a></li>

@@ -86,7 +86,7 @@ $template->param(
 
 		
 #hàm xử lý chuyển chữ thành số
-my $all_koha_news1   = &getTinTuc($news_lang,$homebranch,2,2);
+my $all_koha_news1   = &getTinTuc($news_lang,$homebranch,2,4);
 my $koha_news_count1 = scalar @$all_koha_news1;
 
 

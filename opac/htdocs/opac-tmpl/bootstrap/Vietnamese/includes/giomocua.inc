@@ -1,15 +1,15 @@
 <div class="link">
-	<h3>Liên kết thư viện</h3>
-	<div class="link bar" style="">
-		<a href=""><p class="ncbsearch">Search 01</p></a>
+	<h3 class="title">Liên kết thư viện</h3>
+	<div class="bar">
+		<a href=""><p class="ncbsearch">NCB Bank</p></a>
 	</div>
-	<div class="link bar" style="">
-		<a href=""><p class="ncbsearch">Search 02</p></a>
+	<div class="bar">
+		<a href=""><p class="ncbsearch">Ngân hàng điện tử</p></a>
 	</div>
-	<div class="link bar" style="">
-		<a href=""><p class="ncbsearch">Search 03</p></a>
+	<div class="bar">
+		<a href=""><p class="ncbsearch">Hỗ trợ tính toán</p></a>
 	</div>
-	<div class="link bar" style="">
-		<a href=""><p class="ncbsearch">Search 03</p></a>
+	<div class="bar">
+		<a href=""><p class="ncbsearch">Biểu phí</p></a>
 	</div>
 </div>

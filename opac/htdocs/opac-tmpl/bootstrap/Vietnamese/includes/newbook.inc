@@ -1,7 +1,7 @@
 <div class="row-fluid">
 	[% IF ( tong_sach ) %]
 		<div id="sachmoi">
-		<h3>Sách mới</h3>
+		<h3 class="title">Sách mới</h3>
 		<div id="owl-sachmoi" class="owl-carousel">
 		[% FOREACH sach IN sach_moi %]
 						<div class="item">
@@ -10,7 +10,7 @@
 						<img src="/cgi-bin/koha/opac-image.pl?thumbnail=1&amp;biblionumber= [% sach.biblionumber %]" alt="Owl Image" title="[% sach.title %]">
 						</a>
 						</div>
-						<div class="title-book" style="position: absolute;top: 113px;">
+						<div class="title-book" style="position: absolute;">
 							<a href="/cgi-bin/koha/opac-detail.pl?biblionumber=[% sach.biblionumber |url %]" title="[% sach.title %]">[% sach.title %]</a>
 						</div>
 						</div>

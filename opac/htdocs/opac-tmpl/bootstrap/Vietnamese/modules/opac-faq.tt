@@ -1,15 +1,4 @@
-[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %] 
-
-<style>
-@media (min-width: 768px){
-	.item .img-book{
-		margin-left:40px;
-	}
-	.item .title-book{
-		margin-left:40px;
-	}
-}
-</style>
+[% USE Koha %] [% INCLUDE 'doc-head-open.inc' %] [% IF ( LibraryNameTitle ) %][% LibraryNameTitle %][% ELSE %]Koha online[% END %]  [% INCLUDE 'doc-head-close.inc' %] [% BLOCK cssinclude %][% END %]
 
 </head>
 [% INCLUDE 'bodytag.inc' bodyid='opac-main' %]

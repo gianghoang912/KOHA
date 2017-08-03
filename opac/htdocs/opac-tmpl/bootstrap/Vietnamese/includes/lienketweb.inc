@@ -1,4 +1,4 @@
-<select class="lienketweb" style="width:100%;margin-top:10px; color:#159eae;">
+<select class="lienketweb" style="width:100%;margin-top:20px; color:#333333;">
 	<option value="">---------- Liên kết Website ----------</option>
 	<option value="#">Link 01</option>
 	<option value="#">Link 02</option>
@@ -16,3 +16,6 @@
 		})
 	})
 </script>
+<div class="counter">
+	<p>0000999999</p>
+</div>

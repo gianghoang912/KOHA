@@ -7,8 +7,15 @@
 	<div class="navbar container">
 	 <div class="navbar-inner">
 		<ul class="nav">
-            <li>
-                <a href="#" id="cartmenuitem" class="cart-message" tabindex="-1" role="menuitem">Giỏ tài liệu của bạn trống</a>
+            <li class="dropdown">
+                <a href="#" title="Collect items you are interested in" class="dropdown-toggle" id="cartmenulink" data-toggle="dropdown" role="button">
+                    <i id="carticon" class="icon-shopping-cart"></i> <span class="cartlabel">Giỏ hàng</span> <span id="basketcount"></span> <b class="caret"></b>
+                </a>
+                <ul aria-labelledby="cartmenulink" role="menu" class="dropdown-menu">
+                    <li role="presentation">
+                        <a href="#" id="cartmenuitem" class="cart-message" tabindex="-1" role="menuitem">Giỏ tài liệu của bạn trống</a>
+                    </li>
+                </ul>
             </li>
 			<!--<li><a style="color:#15a1b1;" href="http://lirc.cep.edu.vn/" target="_blank">TRANG THÔNG TIN THƯ VIỆN</a></li>
 			<li><a style="color:#15a1b1;" href="http://dlib.cep.edu.vn/" target="_blank">THƯ VIỆN SỐ</a></li>
@@ -22,7 +29,7 @@
 				[%# CAS authentication is too complicated for modal window %]
 					<li><a href="/cgi-bin/koha/opac-user.pl" style="margin-top:0px;"> Đăng nhập</a></li>
             [% ELSE %]
-                    <li><a href="/cgi-bin/koha/opac-user.pl" style="margin-top:0px;  color:#15a1b1;" class="btn btn-thuan loginModal-trigger" role="button" data-toggle="modal"><i class="icon-user"></i> Đăng nhập</a></li>
+                    <li><a href="/cgi-bin/koha/opac-user.pl" style="margin-top:0px;  color:#004e96;" class="loginModal-trigger" role="button" data-toggle="modal"><i class="icon-user"></i> Đăng nhập</a></li>
             [% END %]
 									
 		[% END %]
@@ -64,10 +71,6 @@
 	[% END %]
 							
 [% END %]
-            <li><a style="padding-left:0px ; padding-right:0px ; color:#15a1b1" href="/cgi-bin/koha/opac-changelanguage.pl?language=en">EN</a></li>
-            <li><a style="padding-left:3px ; padding-right:3px ; color:#15a1b1 ">|</a></li>
-            <li><a style="padding-left:0px; padding-right:20px; color:#15a1b1 " href="/cgi-bin/koha/opac-changelanguage.pl?language=Vietnamese">VN</a></li>
-
         </ul>
 		</div>	
 	</div> <!-- end intersite-nav -->
@@ -207,160 +210,161 @@
         <div class="main-search-menu header-search">
             <div class="main-search container">
                 <div class="row">
-                    <form name="searchform" method="get" action="/cgi-bin/koha/opac-search.pl" id="searchform" class="form-inline">
-
-                        [% UNLESS ( Koha.Preference( 'OpacAddMastheadLibraryPulldown' ) == 1 ) %]
-                        <div class="input-append ">
-                            <select class="col-xs-3" name="idx" id="masthead_search">
-                                [% IF ( ms_kw ) %]
-                                <option selected="selected" value="">Từ khóa bất kỳ</option>
-                                [% ELSE %]
-                                <option value="">Tìm kiếm chung</option>
-                                [% END # /ms_kw %]
-                                [% IF ( ms_ti ) %]
-                                <option selected="selected" value="ti">Nhan đề</option>
-                                [% ELSE %]
-                                <option value="ti">Nhan đề</option>
-                                [% END # /ms_ti %]
-                                [% IF ( ms_au ) %]
-                                <option selected="selected" value="au">Tác giả</option>
-                                [% ELSE %]
-                                <option value="au">Tác giả</option>
-                                [% END # /ms_au%]
-                                [% IF ( ms_su ) %]
-                                <option selected="selected" value="su">Chủ đề</option>
-                                [% ELSE %]
-                                <option value="su"> Chủ đề</option>
-                                [% END # /ms_su %]
-                                [% IF ( ms_nb ) %]
-                                <option selected="selected" value="nb"> Số ISBN</option>
-                                [% ELSE %]
-                                <option value="nb"> Số ISBN</option>
-                                [% END # /ms_nb%]
-                                [% IF ( ms_se ) %]
-                                <option selected="selected" value="se"> Tùng thư</option>
-                                [% ELSE %]
-                                <option value="se"> Tùng thư</option>
-                                [% END # /ms_se %]
-                                [% IF ( numbersphr ) %]
-                                [% IF ( ms_callnum ) %]
-                                <option selected="selected" value="callnum,phr"> Ký hiệu phân loại</option>
-                                [% ELSE %]
-                                <option value="callnum,phr"> Ký hiệu phân loại</option>
-                                [% END #/ms_callnum %]
-                                [% ELSE %]
-                                [% IF ( ms_callnum ) %]
-                                <option selected="selected" value="callnum">Ký hiệu phân loại</option>
-                                [% ELSE %]
-                                <option value="callnum">Ký hiệu phân loại</option>
-                                [% END # /ms_callnum %]
-                                [% END # /numbersphr %]
-                            </select>
-                            [% END %]
-                            [% IF ( ms_value ) %]
-                            <input class="col-xs-7" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" value="[% ms_value |html %]" /><span id="translControl"></span>
-                            [% ELSE %]
-                            <input class="col-xs-7" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" /><span id="translControl"></span>
-                            [% END # /ms_value %]
+                    <div class="input-append ">
+                        <form name="searchform" method="get" action="/cgi-bin/koha/opac-search.pl" id="searchform" class="form-inline">
 
                             [% UNLESS ( Koha.Preference( 'OpacAddMastheadLibraryPulldown' ) == 1 ) %]
-                            <button type="submit" id="searchsubmit" class="">Tìm kiếm</button>
-                            <ul class="ul1">
-                                <li class="li1"><a class="menu-duoi" href=""></a>
+
+                                <select class="col-xs-3" name="idx" id="masthead_search">
+                                    [% IF ( ms_kw ) %]
+                                    <option selected="selected" value="">Từ khóa bất kỳ</option>
+                                    [% ELSE %]
+                                    <option value="">Tìm kiếm chung</option>
+                                    [% END # /ms_kw %]
+                                    [% IF ( ms_ti ) %]
+                                    <option selected="selected" value="ti">Nhan đề</option>
+                                    [% ELSE %]
+                                    <option value="ti">Nhan đề</option>
+                                    [% END # /ms_ti %]
+                                    [% IF ( ms_au ) %]
+                                    <option selected="selected" value="au">Tác giả</option>
+                                    [% ELSE %]
+                                    <option value="au">Tác giả</option>
+                                    [% END # /ms_au%]
+                                    [% IF ( ms_su ) %]
+                                    <option selected="selected" value="su">Chủ đề</option>
+                                    [% ELSE %]
+                                    <option value="su"> Chủ đề</option>
+                                    [% END # /ms_su %]
+                                    [% IF ( ms_nb ) %]
+                                    <option selected="selected" value="nb"> Số ISBN</option>
+                                    [% ELSE %]
+                                    <option value="nb"> Số ISBN</option>
+                                    [% END # /ms_nb%]
+                                    [% IF ( ms_se ) %]
+                                    <option selected="selected" value="se"> Tùng thư</option>
+                                    [% ELSE %]
+                                    <option value="se"> Tùng thư</option>
+                                    [% END # /ms_se %]
+                                    [% IF ( numbersphr ) %]
+                                    [% IF ( ms_callnum ) %]
+                                    <option selected="selected" value="callnum,phr"> Ký hiệu phân loại</option>
+                                    [% ELSE %]
+                                    <option value="callnum,phr"> Ký hiệu phân loại</option>
+                                    [% END #/ms_callnum %]
+                                    [% ELSE %]
+                                    [% IF ( ms_callnum ) %]
+                                    <option selected="selected" value="callnum">Ký hiệu phân loại</option>
+                                    [% ELSE %]
+                                    <option value="callnum">Ký hiệu phân loại</option>
+                                    [% END # /ms_callnum %]
+                                    [% END # /numbersphr %]
+                                </select>
+                                [% END %]
+                                [% IF ( ms_value ) %]
+                                <input class="col-xs-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" value="[% ms_value |html %]" /><span id="translControl"></span>
+                                [% ELSE %]
+                                <input class="col-xs-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" /><span id="translControl"></span>
+                                [% END # /ms_value %]
+
+                                [% UNLESS ( Koha.Preference( 'OpacAddMastheadLibraryPulldown' ) == 1 ) %]
+                                <button type="submit" id="searchsubmit" class="">Tìm kiếm</button>
+
+
+                            [% END %]
+                        </form>
+                        <ul class="ul1 pull-right">
+                            <li class="li1"><a class="menu-duoi" href="#"></a>
+                                <ul>
+                                    <li><a href="/cgi-bin/koha/opac-shelves.pl"> Giá sách ảo</a></li>
+                                    <!--<li><a href="/cgi-bin/koha/opac-z3950.pl"> Tìm kiếm Z39.50</a></li>-->
+                                    <li><a href="/cgi-bin/koha/opac-search.pl"> Tìm kiếm nâng cao</a></li>
+                                    [% IF ( Koha.Preference( 'UseCourseReserves' ) == 1 ) %]<li><a href="/cgi-bin/koha/opac-course-reserves.pl"> CSDL Khóa học</a></li>[% END %]
+                                    [% IF Koha.Preference( 'OpacBrowser' ) == 1 %]<li><a href="/cgi-bin/koha/opac-browser.pl">Tìm kiếm phân cấp</a></li>[% END %]
+                                    [% IF Koha.Preference( 'OpacAuthorities' ) == 1 %]<li><a href="/cgi-bin/koha/opac-authorities-home.pl"> Tìm dữ liệu kiểm soát</a></li>[% END %]
+                                    [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'reviewson' ) == 1 ) && ( Koha.Preference( 'OpacShowRecentComments' ) == 1 ) ) %]<li><a href="/cgi-bin/koha/opac-showreviews.pl"> Bình luận mới nhất</a></li>[% END %]
+                                    [% IF Koha.Preference( 'TagsEnabled' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags.pl"> Mây Tag</a></li>[% END %]
+                                    [% IF Koha.Preference( 'OpacCloud' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags_subject.pl"> Mây chủ đề</a></li>[% END %]
+                                    [% IF Koha.Preference( 'OpacTopissue' ) == 1 %]<li><a href="/cgi-bin/koha/opac-topissues.pl"> Mượn nhiều nhất</a></li>[% END %]
+                                    [% IF Koha.Preference( 'suggestion' ) == 1 %]
+                                    [% IF Koha.Preference( 'AnonSuggestions' ) == 1 %]
+                                    <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
+                                    [% ELSIF ( ( Koha.Preference( 'OPACViewOthersSuggestions' ) == 1 ) ) %]
+                                    <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
+                                    [% END %]
+                                    [% END %]
+
+
+                                </ul>
+                            </li>
+                            <!--
+                            <li class="li1">
+                                <a href="" class="menu-cart" id="cartmenulink"><span id="basketcount"></span></a>
+                                <ul aria-labelledby="cartmenulink" class="cls-cartmenulink">
+                                <li role="presentation">
+                                    <a href="#" id="cartmenuitem" class="cart-message" tabindex="-1" role="menuitem">Giỏ tài liệu của bạn trống.</a>
+                                </li>
+                                </ul>
+
+                            </li>
+                            -->
+                            <!--
+                            [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+
+                                [% UNLESS ( loggedinusername ) %]
+                                    [% IF Koha.Preference('casAuthentication') %]
+                                        [%# CAS authentication is too complicated for modal window %]
+                                        <li class="li1 last"><a class="btn btn-thuan" href="/cgi-bin/koha/opac-user.pl"> Đăng nhập</a></li>
+                                    [% ELSE %]
+                                        <li class="li1 last"><a href="/cgi-bin/koha/opac-user.pl" class="btn btn-thuan loginModal-trigger" role="button" data-toggle="modal"><i class="icon-user"></i> Đăng nhập</a></li>
+                                    [% END %]
+
+                                [% END %]
+
+                                [% IF ( loggedinusername ) %]
+                                    <li class="li1 last"><a class="btn btn-thuan" href="/cgi-bin/koha/opac-user.pl"><i class="icon-user"></i> [% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</a>
                                     <ul>
-                                        <li><a href="/cgi-bin/koha/opac-shelves.pl"> Giá sách ảo</a></li>
-                                        <!--<li><a href="/cgi-bin/koha/opac-z3950.pl"> Tìm kiếm Z39.50</a></li>-->
-                                        <li><a href="/cgi-bin/koha/opac-search.pl"> Tìm kiếm nâng cao</a></li>
-                                        [% IF ( Koha.Preference( 'UseCourseReserves' ) == 1 ) %]<li><a href="/cgi-bin/koha/opac-course-reserves.pl"> CSDL Khóa học</a></li>[% END %]
-                                        [% IF Koha.Preference( 'OpacBrowser' ) == 1 %]<li><a href="/cgi-bin/koha/opac-browser.pl">Tìm kiếm phân cấp</a></li>[% END %]
-                                        [% IF Koha.Preference( 'OpacAuthorities' ) == 1 %]<li><a href="/cgi-bin/koha/opac-authorities-home.pl"> Tìm dữ liệu kiểm soát</a></li>[% END %]
-                                        [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'reviewson' ) == 1 ) && ( Koha.Preference( 'OpacShowRecentComments' ) == 1 ) ) %]<li><a href="/cgi-bin/koha/opac-showreviews.pl"> Bình luận mới nhất</a></li>[% END %]
-                                        [% IF Koha.Preference( 'TagsEnabled' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags.pl"> Mây Tag</a></li>[% END %]
-                                        [% IF Koha.Preference( 'OpacCloud' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags_subject.pl"> Mây chủ đề</a></li>[% END %]
-                                        [% IF Koha.Preference( 'OpacTopissue' ) == 1 %]<li><a href="/cgi-bin/koha/opac-topissues.pl"> Mượn nhiều nhất</a></li>[% END %]
-                                        [% IF Koha.Preference( 'suggestion' ) == 1 %]
-                                        [% IF Koha.Preference( 'AnonSuggestions' ) == 1 %]
-                                        <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
-                                        [% ELSIF ( ( Koha.Preference( 'OPACViewOthersSuggestions' ) == 1 ) ) %]
-                                        <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
-                                        [% END %]
-                                        [% END %]
 
-
-                                    </ul>
-                                </li>
-                                <!--
-                                <li class="li1">
-                                    <a href="" class="menu-cart" id="cartmenulink"><span id="basketcount"></span></a>
-                                    <ul aria-labelledby="cartmenulink" class="cls-cartmenulink">
-                                    <li role="presentation">
-                                        <a href="#" id="cartmenuitem" class="cart-message" tabindex="-1" role="menuitem">Giỏ tài liệu của bạn trống.</a>
-                                    </li>
-                                    </ul>
-
-                                </li>
-                                -->
-                                <!--
-                                [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
-
-                                    [% UNLESS ( loggedinusername ) %]
-                                        [% IF Koha.Preference('casAuthentication') %]
-                                            [%# CAS authentication is too complicated for modal window %]
-                                            <li class="li1 last"><a class="btn btn-thuan" href="/cgi-bin/koha/opac-user.pl"> Đăng nhập</a></li>
-                                        [% ELSE %]
-                                            <li class="li1 last"><a href="/cgi-bin/koha/opac-user.pl" class="btn btn-thuan loginModal-trigger" role="button" data-toggle="modal"><i class="icon-user"></i> Đăng nhập</a></li>
-                                        [% END %]
-
-                                    [% END %]
-
-                                    [% IF ( loggedinusername ) %]
-                                        <li class="li1 last"><a class="btn btn-thuan" href="/cgi-bin/koha/opac-user.pl"><i class="icon-user"></i> [% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</a>
-                                        <ul>
-
-                                        [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
-                                    [% UNLESS ( loggedinusername ) %]
-                                        [% IF Koha.Preference('casAuthentication') %]
-                                            [%# CAS authentication is too complicated for modal window %]
-                                            <li><a href="/cgi-bin/koha/opac-user.pl"> Đăng nhập</a></li>
-                                        [% ELSE %]
-                                            <li><a href="/cgi-bin/koha/opac-user.pl" class="loginModal-trigger" role="button" data-toggle="modal"> Đăng nhập</a></li>
-                                        [% END %]
-                                    [% END %]
-                                    [% IF ( loggedinusername ) %]
-                                        <li><p class="members navbar-text">Xin chào, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername">[% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</span></a></p></li>
-                                        <li class="divider-vertical"></li>
+                                    [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+                                [% UNLESS ( loggedinusername ) %]
+                                    [% IF Koha.Preference('casAuthentication') %]
+                                        [%# CAS authentication is too complicated for modal window %]
+                                        <li><a href="/cgi-bin/koha/opac-user.pl"> Đăng nhập</a></li>
+                                    [% ELSE %]
+                                        <li><a href="/cgi-bin/koha/opac-user.pl" class="loginModal-trigger" role="button" data-toggle="modal"> Đăng nhập</a></li>
                                     [% END %]
                                 [% END %]
-                                [% IF EnableOpacSearchHistory %]
-                                    <li><p class="navbar-text"><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history"> Lịch sử tìm kiếm</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return confirm(MSG_DELETE_SEARCH_HISTORY);">x</a>]</p></li>
+                                [% IF ( loggedinusername ) %]
+                                    <li><p class="members navbar-text">Xin chào, <a href="/cgi-bin/koha/opac-user.pl"><span class="loggedinusername">[% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</span></a></p></li>
                                     <li class="divider-vertical"></li>
                                 [% END %]
-                                [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
-                                    [% IF ( loggedinusername ) %]
-                                        <li><p class="navbar-text">
-                                            [% IF persona %]
-                                                <a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1" onclick='navigator.id.logout();'>
-                                            [% ELSE %]
-                                                <a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">
-                                            [% END %]
-                                            Đăng xuất</a></p></li>
-                                    [% END %]
+                            [% END %]
+                            [% IF EnableOpacSearchHistory %]
+                                <li><p class="navbar-text"><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history"> Lịch sử tìm kiếm</a> [<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return confirm(MSG_DELETE_SEARCH_HISTORY);">x</a>]</p></li>
+                                <li class="divider-vertical"></li>
+                            [% END %]
+                            [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+                                [% IF ( loggedinusername ) %]
+                                    <li><p class="navbar-text">
+                                        [% IF persona %]
+                                            <a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1" onclick='navigator.id.logout();'>
+                                        [% ELSE %]
+                                            <a class="logout" id="logout" href="/cgi-bin/koha/opac-main.pl?logout.x=1">
+                                        [% END %]
+                                        Đăng xuất</a></p></li>
+                                [% END %]
+                            [% END %]
+
+                                    </ul>
+
+                                    </li>
+
                                 [% END %]
 
-                                        </ul>
-
-                                        </li>
-
-                                    [% END %]
-
-                                [% END %]
-                                -->
-                            </ul>
-
-                        </div>
-                        [% END %]
-
-                    </form>
+                            [% END %]
+                            -->
+                        </ul>
+                    </div>
                 </div>
             </div>
 

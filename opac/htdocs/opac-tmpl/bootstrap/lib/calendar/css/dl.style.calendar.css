@@ -4,7 +4,6 @@
 	border-radius: 0px;
 	box-shadow: none;
 	border:0px;
-	padding-top:10px;
 }
 
 .eventsCalendar-monthWrap{
@@ -12,7 +11,7 @@
 }
 .eventsCalendar-currentTitle{
 	background:#1876cc;
-	margin-top:60px;
+	/*margin-top:60px;*/
 }
 .eventsCalendar-daysList{
 	border: 0px !important;
@@ -21,7 +20,7 @@
 }
 
 .eventCalendar-wrap .arrow{
-
+	top:0 !important;
 }
 
 .eventsCalendar-monthWrap{

@@ -1,17 +1,5 @@
 /* lg */
 @media (min-width: 1200px){
-    .container{
-        width:1280px !important;
-    }
-
-    .info-dl {margin-left:-50px}
-
-    .main-footer{
-        width:1036px;
-        margin:0px auto;
-        border-radius:0px;
-        border:0px;
-    }
     .intersite{
         width:1036px;
         margin:0px auto;
@@ -21,14 +9,15 @@
         padding-left:0px;
         padding-right:0px;
     }
+
+    .hover-circle, .hover-circle img {
+        width: 210px;
+        height: 127px;
+    }
 }
 
 /* md */
 @media (min-width: 992px) and (max-width: 1199px){
-    .header-main{
-        width:1036px;
-    }
-
     .nav-collapse.collapse.navbar-responsive-cast{
         height:0px !important;
         overflow:hidden !important;

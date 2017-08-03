@@ -263,7 +263,7 @@ sub GetNewsToDisplay1 {
 
 sub ViewVirtualShelves {
 		my $dbh = C4::Context->dbh;
-		my $query = "Select * from virtualshelves where owner = 1 and shelfnumber > 1 limit 5";
+		my $query = "Select * from virtualshelves where owner = 1 and shelfnumber > 1 limit 3";
 		my $sth = $dbh->prepare($query);
 		$sth->execute();
 		my @results1;

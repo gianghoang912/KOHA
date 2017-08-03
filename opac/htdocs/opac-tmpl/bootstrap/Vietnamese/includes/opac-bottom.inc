@@ -1,51 +1,39 @@
- <div class="container-fluid">
-  <div class="row-fluid">
-	 <div class="span12 footer">
-		<div class="main-footer">
-			<div class="span8 info-dl">
-				<div id="logo-bottom">
-					<i>
-					<font style="font-weight: 900;font-size: 20px;">
-						KOHA
-					</font>
-					<font style="font-weight: 700; font-size: 14px; color: #7d7d7d;">
-						Library
-					</font>
-					</i>
-				</div>
-				<div id="content-bottom">
-					Phần mềm quản trị thư viện tích hợp Koha hiện tại đang được áp dụng tại hơn 2400 thư viện trên toàn thế giới. Đây là một trong những phần mềm quản lý thư viện truyền thống phổ biến nhất hiện nay. Tại Việt Nam, phần mềm Koha đang được tùy biến và phát triển bởi nhóm Koha Việt Nam. Website http://koha.vn được xây dựng bởi nhóm Koha Việt Nam của công ty D&L.
-					<!--
-					Đang được áp dụng tại hơn 2400 thư viện trên thế giới, Koha là một trong những phần mềm quản lý thư viên phổ biến nhất hiện nay. Tại Việt Nam, Koha được Việt hóa, phát triển tùy biến và hỗ trợ bởi nhóm Koha Vietnam Website. Koha.vn được phát triển bởi D&L JSC
-					-->
-				</div>
-			</div>
-			
-			
-			<div class="span4 menu-bottom">
-				<div class="menu-bt1">
-					<a href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tặng sách</a>
-					<a href="/cgi-bin/koha/opac-dv.pl">Dịch vụ</a>
-					<a href="https://www.ncb-bank.vn/vi/tin-tuc">Tin tức</a>
-				</div>
-				<div class="menu-bt2">
-					<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=6&idgroup=4">Giới thiệu</a>
-					<a href="/cgi-bin/koha/opac-faq.pl">Hỏi đáp</a>
-					<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=7&idgroup=4">Liên hệ</a>
-				</div>
-				<div class="menu-bt3">
-					<a href="#" target="_blank"><img src="../../opac-tmpl/bootstrap/images/dl/logoface.png"></a>
-					<a href="#"><img src="../../opac-tmpl/bootstrap/images/dl/logotwitter.png"></a>
-				</div>
-				
-			</div>
-			
-		</div>
-	 </div>
-	 <div class="span12 footer-dl">
-		<font color="white">2017 – Copyright NCB Bank</font>
-	 </div>
-  </div>
+ <div class="container-fluid footer">
+     <div class="footer-NCB">
+         <div class="container">
+             <div class="main-footer">
+                 <div class="col-xs-8 info-dl">
+                     <div id="logo-bottom">
+                         <h3>Thư viện Ngân hàng TMCP Quốc Dân - NCB</h3>
+                     </div>
+                     <div id="content-bottom">
+                         <p>Thư viện Ngân hàng TMCP Quốc Dân – NCB hiện tại có hơn 10.000 đầu sách về nhiều lĩnh vực khác nhau như: Kinh tế - tài chính, chính trị, khoa học tự nhiên, xã hội học..</p>
+                     </div>
+                 </div>
+                 <div class="col-xs-4 menu-bottom">
+                     <div class="menu-bt1">
+                         <a href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tặng sách</a>
+                         <a href="/cgi-bin/koha/opac-dv.pl">Dịch vụ</a>
+                         <a href="https://www.ncb-bank.vn/vi/tin-tuc">Tin tức</a>
+                     </div>
+                     <div class="menu-bt2">
+                         <a href="/cgi-bin/koha/opac-ctnews.pl?idnew=6&idgroup=4">Giới thiệu</a>
+                         <a href="/cgi-bin/koha/opac-faq.pl">Hỏi đáp</a>
+                         <a href="/cgi-bin/koha/opac-ctnews.pl?idnew=7&idgroup=4">Liên hệ</a>
+                     </div>
+                     <div class="menu-bt3">
+                         <a href="#" target="_blank"><img src="../../opac-tmpl/bootstrap/images/dl/logoface.png"></a>
+                         <a href="#"><img src="../../opac-tmpl/bootstrap/images/dl/logotwitter.png"></a>
+                     </div>
+
+                 </div>
+
+             </div>
+         </div>
+     </div>
+     <div class="footer-dl">
+         <span style="color:white">© Bản quyền 2017 thuộc về Ngân Hàng Quốc Dân (NCB)</span>
+     </div>
  </div>
 
 [% UNLESS ( is_popup ) %]

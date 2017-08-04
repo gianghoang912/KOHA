@@ -10,9 +10,16 @@
         padding-right:0px;
     }
 
+    #clsss1{
+        display:none;
+    }
+
     .hover-circle, .hover-circle img {
-        width: 210px;
+        width: 190px;
         height: 127px;
+    }
+    .bst>ul>li:last-child{
+        padding-right:0 !important;
     }
 }
 
@@ -26,9 +33,32 @@
         height:0px !important;
         overflow:hidden !important;
     }
+    #clsss1{
+        display:none;
+    }
+    .hover-circle, .hover-circle img {
+        width: 150px;
+        height: 100px;
+    }
+    .bst>ul>li:last-child{
+        padding-right:0 !important;
+    }
 }
 /* sm */
 @media (min-width: 768px) and (max-width: 991px){
+    .navbar .btn-navbar {
+        display: block;
+    }
+    .navbar .nav.desktop-menu{
+        display:none !important;
+    }
+    #navbar-responsive-collapse>ul>li{
+        float:right;
+        width: 100%;
+        border:none;
+        text-align: right;
+        line-height: 20px;
+    }
     .main-search ul{
         display:none;
     }
@@ -75,53 +105,47 @@
     .nav.pull-right.cls-mobi{
         display:block !important;
     }
-
-    .main{
-        margin:0px auto;
-        border-radius:0px;
-        border:0px;
-    }
     .span10.maincontent{
         margin-left:15px;
     }
+    .hover-circle, .hover-circle img {
+        width: 113px;
+        height: 74px;
+    }
+    .bst>ul>li:last-child{
+        padding-right:0 !important;
+    }
 }
 
-/* XS Landscape */
+/* XS */
 @media (max-width: 767px){
-    #logo {
-        background: transparent url("../../images/dl/home.png") no-repeat;
-        margin: 14px 14px 14px 14px;
-        width: 32px;
+    #logo{
+        background-position: inherit !important;
     }
     #logo a{
         padding: 16px 0px;
         width: 32px;
     }
+    .navbar .nav.desktop-menu{
+        display:none !important;
+    }
+    #navbar-responsive-collapse>ul>li{
+        float:right;
+        width: 100%;
+        border:none;
+        text-align: right;
+        line-height: 20px;
+    }
+    .input-append ul.ul1{
+        display:none;
+    }
     #site-name {display:none;}
-
-
+    #searchform>input{
+        width: 41.66666667% !important;
+    }
     .dvitem{
         width:100%;
         margin-left:0px;
-    }
-
-    .main-footer .info-dl {
-
-        margin-left: 0px;
-    }
-    .main-footer .info-dl p {
-        padding-right:40px;
-    }
-    .info-dl{
-        border-bottom:1px solid #c2c2c2;
-        border-right:none;
-        margin-top:10px;padding-left:20px
-    }
-    .main{
-        padding:0px;
-        border:0px;
-        margin:0px;
-        border-radius:0px;
     }
 
     .dvitem{
@@ -138,11 +162,63 @@
         float:left;
 
     }
-    .info-dl { padding-left:20px; text-align:center;}
-    .info-dl p {font-size:15px; text-align:center;}
+    .hover-circle, .hover-circle img {
+        width: 160px;
+        height: 106px;
+    }
+    .link h3{
+        margin-top:10px !important;
+    }
+    .hover-circle, .hover-circle img {
+        width: 245px;
+        height: 161px;
+        margin:0 auto;
+    }
 }
 
-/* XS Portrait */
-@media (max-width: 544px){
+/* XS Landscape only */
 
+@media (min-width: 545px) and (max-width: 767px){
+    .sk-ct{
+        margin-bottom: 5px;
+    }
+    .sk-item h5{
+        height:20px;
+        margin-bottom: 5px;
+    }
+}
+
+/* XS Portrait only */
+@media (max-width: 544px){
+    .input-append{
+        padding:0 !important;
+        width: fit-content;
+    }
+    #masthead_search{
+        font-size:10px;
+        padding:0;
+    }
+    #searchsubmit{
+        padding:5px !important;
+    }
+    #daily-quote{
+        font-size:10px;
+    }
+    .hover-circle, .hover-circle img {
+        width: 130px;
+        height: 85px;
+        margin:0 auto;
+    }
+    #dailyncb{
+        font-size: 12px;
+    }
+    #daily-quote-text{
+        font-size:10px;
+    }
+    #calendar{
+        width:100% !important;
+    }
+    .link.lienKetThuVien{
+        width:100% !important;
+    }
 }

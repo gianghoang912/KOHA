@@ -2,7 +2,7 @@
      <div class="footer-NCB">
          <div class="container">
              <div class="main-footer">
-                 <div class="col-xs-8 info-dl">
+                 <div class="col-xs-12 col-sm-8 info-dl">
                      <div id="logo-bottom">
                          <h3>Thư viện Ngân hàng TMCP Quốc Dân - NCB</h3>
                      </div>
@@ -10,7 +10,7 @@
                          <p>Thư viện Ngân hàng TMCP Quốc Dân – NCB hiện tại có hơn 10.000 đầu sách về nhiều lĩnh vực khác nhau như: Kinh tế - tài chính, chính trị, khoa học tự nhiên, xã hội học..</p>
                      </div>
                  </div>
-                 <div class="col-xs-4 menu-bottom">
+                 <div class="col-xs-12 col-sm-4 menu-bottom">
                      <div class="menu-bt1">
                          <a href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tặng sách</a>
                          <a href="/cgi-bin/koha/opac-dv.pl">Dịch vụ</a>

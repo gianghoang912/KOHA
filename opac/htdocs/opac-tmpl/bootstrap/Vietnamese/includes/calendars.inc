@@ -1,4 +1,4 @@
-<div id="calendar">
+<div id="calendar" class="col-xs-6 col-sm-12">
 	<h3 class="title">Lịch sự kiện</h3>
 <link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/lib/calendar/css/eventCalendar.css" />
 <link rel="stylesheet" type="text/css" href="[% interface %]/[% theme %]/lib/calendar/css/eventCalendar_theme_responsive.css" />

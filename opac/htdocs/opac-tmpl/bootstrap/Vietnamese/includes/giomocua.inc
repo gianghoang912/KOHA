@@ -1,4 +1,4 @@
-<div class="link">
+<div class="link lienKetThuVien col-xs-6 col-sm-12">
 	<h3 class="title">Liên kết thư viện</h3>
 	<div class="bar">
 		<a href=""><p class="ncbsearch">NCB Bank</p></a>

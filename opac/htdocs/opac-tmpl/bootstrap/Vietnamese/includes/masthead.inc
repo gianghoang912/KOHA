@@ -17,6 +17,37 @@
                     </li>
                 </ul>
             </li>
+            <li class="dropdown">
+                <a href="#" class="dropdown-toggle" id="listsmenu" data-toggle="dropdown" role="button"><i class="icon-list icon-white"></i> <span class="listslabel">Lists</span> <b class="caret"></b></a>
+                <ul aria-labelledby="listsmenu" role="menu" class="dropdown-menu">
+                    [% IF ( pubshelves ) %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves" tabindex="-1" role="menuitem"><strong>Public lists</strong></a></li>
+                    [% FOREACH pubshelvesloo IN pubshelvesloop %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=[% pubshelvesloo.shelfnumber %]&amp;sortfield=[% pubshelvesloo.sortfield %]" tabindex="-1" role="menuitem">[% pubshelvesloo.shelfname |html %]</a></li>
+                    [% END %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=publicshelves" tabindex="-1" role="menuitem" class="listmenulink">View All</a></li>
+                    [% ELSE %]
+                    <li role="presentation"><a href="#" tabindex="-1" class="menu-inactive" role="menuitem">No public lists</a></li>
+                    [% END %]
+                    <li class="divider" role="presentation"></li>
+                    [% IF Koha.Preference( 'opacuserlogin' ) == 1 %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves" tabindex="-1" role="menuitem"><strong>Your lists</strong></a></li>
+                    [% IF ( loggedinusername ) %]
+                    [% IF ( barshelves ) %]
+                    [% FOREACH barshelvesloo IN barshelvesloop %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?viewshelf=[% barshelvesloo.shelfnumber %]&amp;sortfield=[% barshelvesloo.sortfield %]" tabindex="-1" role="menuitem">[% barshelvesloo.shelfname |html %]</a></li>
+                    [% END %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves" tabindex="-1" role="menuitem" class="listmenulink">View all</a></li>
+                    [% ELSE %]
+                    <li role="presentation"><a href="#" tabindex="-1" class="menu-inactive" role="menuitem">No private lists</a></li>
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-shelves.pl?display=privateshelves" tabindex="-1" role="menuitem" class="listmenulink">New list</a></li>
+                    [% END %]
+                    [% ELSE %]
+                    <li role="presentation"><a href="/cgi-bin/koha/opac-user.pl" tabindex="-1" class="menu-inactive loginModal-trigger" role="menuitem">Log in to create your own lists</a></li>
+                    [% END # / IF loggedinusername %]
+                    [% END # / IF opacuserlogin %]
+                </ul> <!-- / .dropdown-menu -->
+            </li> <!-- / .dropdown -->
 			<!--<li><a style="color:#15a1b1;" href="http://lirc.cep.edu.vn/" target="_blank">TRANG THÔNG TIN THƯ VIỆN</a></li>
 			<li><a style="color:#15a1b1;" href="http://dlib.cep.edu.vn/" target="_blank">THƯ VIỆN SỐ</a></li>
 			<li><a style="color:#15a1b1;" href="http://vufind.cep.edu.vn/" target="_blank">VUFIND</a></li>-->
@@ -81,127 +112,113 @@
 			<div class="navbar navbar-inverse navbar-static-top container">
 				<div class="navbar-inner">
 					<div class="header-content row">
-
 						<div class="col-xs-2">
-						<a id="clsss1"  class="btn btn-navbar btn-nav1" data-toggle="collapse" data-target=".navbar-responsive-collapse"></a>
-						<a id="clsss2"  class="btn btn-navbar btn-user" data-toggle="collapse" data-target=".navbar-responsive-user"></a>
-						<!--<a class="btn btn-list" ></a>-->
-						<a id="clsss3" id="cartmenulink"  class="btn btn-navbar btn-cart"  data-toggle="collapse" data-target=".navbar-responsive-cast"></a>
-
-
-						<h1 id="logo">
-							<a class="brand" href="/cgi-bin/koha/opac-main.pl"></a>
-						</h1>
+                            <h1 id="logo">
+                                <a class="brand" href="/cgi-bin/koha/opac-main.pl"></a>
+                            </h1>
 						</div>
 						<div class="col-xs-10">
-						   [% IF ( Koha.Preference( 'opacbookbag' ) == 1 ) %]
-                        <div id="cartDetails" class="cart-message">Giỏ tài liệu của bạn trống.</div>
-                    [% END %]
-<!--						<div class="nav-collapse collapse navbar-responsive-user">-->
-<!--							<ul class="nav  pull-right">-->
-<!--							[% IF Koha.Preference( 'opacuserlogin' ) == 1 %]-->
-<!--                                    [% UNLESS ( loggedinusername ) %]-->
-<!--                                        [% IF Koha.Preference('casAuthentication') %]-->
-<!--                                            [%# CAS authentication is too complicated for modal window %]-->
-<!--                                            <li><a href="/cgi-bin/koha/opac-user.pl"> Đăng nhập</a></li>-->
-<!--                                        [% ELSE %]-->
-<!--                                            <li><a href="/cgi-bin/koha/opac-user.pl" class="loginModal-trigger" role="button" data-toggle="modal"> Đăng nhập</a></li>-->
-<!--                                        [% END %]-->
-<!--                                    [% END %]-->
-<!--                                    [% IF ( loggedinusername ) %]-->
-<!--                                        <li> <a href="/cgi-bin/koha/opac-user.pl">Xin chào: <span class="loggedinusername">[% FOREACH USER_INF IN USER_INFO %][% USER_INF.title %] [% USER_INF.surname %] [% USER_INF.firstname %] [% END %]</span></a></li>-->
-<!--                                    -->
-<!--                                    [% END %]-->
-<!--                                [% END %]-->
-<!--							[% IF EnableOpacSearchHistory %]-->
-<!--								<li><a href="/cgi-bin/koha/opac-search-history.pl" title="View your search history"> Lịch sử tìm kiếm</a> </li>-->
-<!--								<li>-->
-<!--								<a class="logout" href="/cgi-bin/koha/opac-search-history.pl?action=delete" title="Delete your search history" onclick="return confirm(MSG_DELETE_SEARCH_HISTORY);">Xóa lịch sử tìm kiếm</a></li>-->
-<!--							[% END %]-->
-<!--							</ul>-->
-<!--						</div>-->
+                            <ul class="nav pull-right desktop-menu">
+                                <li>
+                                    <a href="/cgi-bin/koha/opac-tangsach.pl?op=add">
+                                        <center>
+                                            <div class="links-menu pull-left">
+                                                <img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/tangsach.png" title="Tặng sách" alt="Tặng sách">
+                                            </div>
+                                            <div class="title pull-right">Tặng sách</div>
+                                        </center>
+                                    </a>
+                                </li>
 
-						<div class="nav-collapse collapse navbar-responsive-collapse">
-							<ul class="nav  pull-right">
+                                <li>
+                                    <a href="/cgi-bin/koha/opac-dv.pl">
+                                        <center>
+                                            <div class="links-menu pull-left">
+                                                <img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/dichvu.png" title="Dịch vụ" alt="Dịch vụ">
+                                            </div>
+                                            <div class="title pull-right">Dịch vụ</div>
+                                        </center>
+                                    </a>
+                                </li>
 
-								  <li>
-								  <a href="/cgi-bin/koha/opac-tangsach.pl?op=add">
-									<center>
-										<div class="links-menu pull-left">
-											<img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/tangsach.png" title="Tặng sách" alt="Tặng sách">
-										</div>
-										<div class="title pull-right">Tặng sách</div>
-									</center>
-								  </a>
-								  </li>
+                                <li>
+                                    <a href="https://www.ncb-bank.vn/vi/tin-tuc" target="_blank" >
+                                        <center>
+                                            <div class="links-menu pull-left">
+                                                <img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/tintuc.png" title="Tin tức" alt="Tin tức">
+                                            </div>
+                                            <div class="title pull-right">Tin tức</div>
+                                        </center>
+                                    </a>
+                                </li>
 
-								  <li>
-								  <a href="/cgi-bin/koha/opac-dv.pl">
-									<center>
-										<div class="links-menu pull-left">
-											<img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/dichvu.png" title="Dịch vụ" alt="Dịch vụ">
-										</div>
-										<div class="title pull-right">Dịch vụ</div>
-									</center>
-								  </a>
-								</li>
+                                <li>
+                                    <a href="/cgi-bin/koha/opac-faq.pl">
+                                        <center>
+                                            <div class="links-menu pull-left">
+                                                <img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/faq.png" title="Hỏi đáp" alt="Hỏi đáp">
+                                            </div>
+                                            <div class="title pull-right">Hỏi đáp</div>
+                                        </center>
+                                    </a>
+                                </li>
 
-								  <li>
-								  <a href="https://www.ncb-bank.vn/vi/tin-tuc" target="_blank" >
-									<center>
-										<div class="links-menu pull-left">
-											<img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/tintuc.png" title="Tin tức" alt="Tin tức">
-										</div>
-										<div class="title pull-right">Tin tức</div>
-									</center>
-								  </a>
-								  </li>
+                                <li>
+                                    <a href="/cgi-bin/koha/opac-ctnews.pl?idnew=7&idgroup=4">
+                                        <center>
+                                            <div class="links-menu pull-left">
+                                                <img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/lienhe.png" title="Liên hệ" alt="Liên hệ">
+                                            </div>
+                                            <div class="title pull-right">Liên hệ</div>
+                                        </center>
+                                    </a>
+                                </li>
 
-								  <li>
-								  <a href="/cgi-bin/koha/opac-faq.pl">
-									<center>
-										<div class="links-menu pull-left">
-											<img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/faq.png" title="Hỏi đáp" alt="Hỏi đáp">
-										</div>
-										<div class="title pull-right">Hỏi đáp</div>
-									</center>
-								  </a>
-								  </li>
+                            </ul>
+                            <a id="clsss1" class="btn btn-nav pull-right hidden-lg hidden-md" data-toggle="collapse" data-target="#navbar-responsive-collapse"></a>
+						    <div id="navbar-responsive-collapse" class="collapse">
+                                <ul class="nav pull-right main-nav1">
+                                    <li>
+                                        <a href="/cgi-bin/koha/opac-tangsach.pl?op=add">Tặng sách</a>
+                                    </li>
 
-								   <li>
-								  <a href="/cgi-bin/koha/opac-ctnews.pl?idnew=7&idgroup=4">
-									<center>
-										<div class="links-menu pull-left">
-											<img src="../../opac-tmpl/bootstrap/images/dl/icon_menu/lienhe.png" title="Liên hệ" alt="Liên hệ">
-										</div>
-										<div class="title pull-right">Liên hệ</div>
-									</center>
-								  </a>
-								  </li>
+                                    <li>
+                                        <a href="/cgi-bin/koha/opac-dv.pl">Dịch vụ</a>
+                                    </li>
 
-							</ul>
+                                    <li>
+                                        <a href="https://www.ncb-bank.vn/vi/tin-tuc" target="_blank" >Tin tức</a>
+                                    </li>
 
-							<ul class="nav pull-right cls-mobi" style="display:none">
+                                    <li>
+                                        <a href="/cgi-bin/koha/opac-faq.pl">Hỏi đáp</a>
+                                    </li>
 
-								<li><a href="/cgi-bin/koha/opac-shelves.pl"> Giá sách ảo</a></li>
-								<!--<li><a href="/cgi-bin/koha/opac-z3950.pl"> Tìm kiếm Z39.50</a></li>-->
-								<li><a href="/cgi-bin/koha/opac-search.pl"> Tìm kiếm nâng cao</a></li>
-                                    [% IF ( Koha.Preference( 'UseCourseReserves' ) == 1 ) %]<li><a href="/cgi-bin/koha/opac-course-reserves.pl"> CSDL Khóa học</a></li>[% END %]
-                                    [% IF Koha.Preference( 'OpacBrowser' ) == 1 %]<li><a href="/cgi-bin/koha/opac-browser.pl">Tìm kiếm phân cấp</a></li>[% END %]
-                                    [% IF Koha.Preference( 'OpacAuthorities' ) == 1 %]<li><a href="/cgi-bin/koha/opac-authorities-home.pl"> Tìm dữ liệu kiểm soát</a></li>[% END %]
-                                    [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'reviewson' ) == 1 ) && ( Koha.Preference( 'OpacShowRecentComments' ) == 1 ) ) %]<li><a href="/cgi-bin/koha/opac-showreviews.pl"> Bình luận mới nhất</a></li>[% END %]
-                                    [% IF Koha.Preference( 'TagsEnabled' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags.pl"> Mây Tag</a></li>[% END %]
-                                    [% IF Koha.Preference( 'OpacCloud' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags_subject.pl"> Mây chủ đề</a></li>[% END %]
-                                    [% IF Koha.Preference( 'OpacTopissue' ) == 1 %]<li><a href="/cgi-bin/koha/opac-topissues.pl"> Mượn nhiều nhất</a></li>[% END %]
-                                    [% IF Koha.Preference( 'suggestion' ) == 1 %]
-                                        [% IF Koha.Preference( 'AnonSuggestions' ) == 1 %]
-                                            <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
-                                        [% ELSIF ( ( Koha.Preference( 'OPACViewOthersSuggestions' ) == 1 ) ) %]
-                                            <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
+                                    <li>
+                                        <a href="/cgi-bin/koha/opac-ctnews.pl?idnew=7&idgroup=4">Liên hệ</a>
+                                    </li>
+
+                                </ul>
+                                <ul class="nav pull-right cls-mobi main-nav2">
+                                    <li><a href="/cgi-bin/koha/opac-shelves.pl"> Giá sách ảo</a></li>
+                                    <!--<li><a href="/cgi-bin/koha/opac-z3950.pl"> Tìm kiếm Z39.50</a></li>-->
+                                    <li><a href="/cgi-bin/koha/opac-search.pl"> Tìm kiếm nâng cao</a></li>
+                                        [% IF ( Koha.Preference( 'UseCourseReserves' ) == 1 ) %]<li><a href="/cgi-bin/koha/opac-course-reserves.pl"> CSDL Khóa học</a></li>[% END %]
+                                        [% IF Koha.Preference( 'OpacBrowser' ) == 1 %]<li><a href="/cgi-bin/koha/opac-browser.pl">Tìm kiếm phân cấp</a></li>[% END %]
+                                        [% IF Koha.Preference( 'OpacAuthorities' ) == 1 %]<li><a href="/cgi-bin/koha/opac-authorities-home.pl"> Tìm dữ liệu kiểm soát</a></li>[% END %]
+                                        [% IF ( ( Koha.Preference( 'opacuserlogin' ) == 1 ) && ( Koha.Preference( 'reviewson' ) == 1 ) && ( Koha.Preference( 'OpacShowRecentComments' ) == 1 ) ) %]<li><a href="/cgi-bin/koha/opac-showreviews.pl"> Bình luận mới nhất</a></li>[% END %]
+                                        [% IF Koha.Preference( 'TagsEnabled' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags.pl"> Mây Tag</a></li>[% END %]
+                                        [% IF Koha.Preference( 'OpacCloud' ) == 1 %]<li><a href="/cgi-bin/koha/opac-tags_subject.pl"> Mây chủ đề</a></li>[% END %]
+                                        [% IF Koha.Preference( 'OpacTopissue' ) == 1 %]<li><a href="/cgi-bin/koha/opac-topissues.pl"> Mượn nhiều nhất</a></li>[% END %]
+                                        [% IF Koha.Preference( 'suggestion' ) == 1 %]
+                                            [% IF Koha.Preference( 'AnonSuggestions' ) == 1 %]
+                                                <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
+                                            [% ELSIF ( ( Koha.Preference( 'OPACViewOthersSuggestions' ) == 1 ) ) %]
+                                                <li><a href="/cgi-bin/koha/opac-suggestions.pl"> Đề xuất mua</a></li>
+                                            [% END %]
                                         [% END %]
-                                    [% END %]
-							</ul>
-						</div> <!-- end nav-collapse -->
+                                </ul>
+                            </div> <!-- end nav-collapse -->
 						</div><!-- end span7-->
 					</div>
 				</div><!-- end navbar-inner-->
@@ -215,7 +232,7 @@
 
                             [% UNLESS ( Koha.Preference( 'OpacAddMastheadLibraryPulldown' ) == 1 ) %]
 
-                                <select class="col-xs-3" name="idx" id="masthead_search">
+                                <select class="col-xs-4" name="idx" id="masthead_search">
                                     [% IF ( ms_kw ) %]
                                     <option selected="selected" value="">Từ khóa bất kỳ</option>
                                     [% ELSE %]
@@ -262,9 +279,9 @@
                                 </select>
                                 [% END %]
                                 [% IF ( ms_value ) %]
-                                <input class="col-xs-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" value="[% ms_value |html %]" /><span id="translControl"></span>
+                                <input class="col-xs-5 col-sm-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" value="[% ms_value |html %]" /><span id="translControl"></span>
                                 [% ELSE %]
-                                <input class="col-xs-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" /><span id="translControl"></span>
+                                <input class="col-xs-5 col-sm-8" type="text" title="Nhập thuật ngữ tìm kiếm" class="transl1" id = "translControl1" name="q" /><span id="translControl"></span>
                                 [% END # /ms_value %]
 
                                 [% UNLESS ( Koha.Preference( 'OpacAddMastheadLibraryPulldown' ) == 1 ) %]

@@ -41,7 +41,7 @@ body{
 
 #logo{
 	width:170px;
-	height:52px;
+	height:49px;
 	background-image: url("../../images/dl/logokoha.png");
 	background-size:cover;
 	margin:10px 0px 10px -10px;
@@ -73,6 +73,10 @@ body{
 }
 .navbar-static-top .navbar-inner .header-content ul li:hover{
 	opacity:1;
+}
+
+#navbar-responsive-collapse{
+	width:100%;
 }
 
 .links-menu{
@@ -428,9 +432,7 @@ h3.title{
 
 
 /* b? s�u t?p n?i b?t*/
-.bst>ul>li:last-child{
-	padding-right:0 !important;
-}
+
 .effect1:hover .overlay {
 	background:#004e96;
 	opacity:0.5;
@@ -790,4 +792,37 @@ p.ncbsearch{
 }
 .giomocua>ul>li{
 	list-style-type: none;
+}
+.eventsCalendar-daysList li.dayWithEvents a, li.eventsCalendar-day.dayWithEvents a:hover{
+	background: #004e96 !important;
+}
+.eventsCalendar-daysList li.today a, .eventsCalendar-daysList li.current a, li.eventsCalendar-day.current a:hover{
+	background: #aaaaaa !important;
+	box-shadow: none !important;
+	text-shadow: none !important;
+}
+
+#clsss1{
+	width:40px;
+	height:40px;
+}
+
+.navbar .btn-nav{
+	clear:both;
+	background: transparent url(../../images/dl/sourcelist_white.png) no-repeat;
+	padding: 16px 18px;
+	border:none;
+	margin: 14px 14px 14px 0px;
+}
+#navbar-responsive-collapse>ul>li>a{
+	padding:10px 0;
+}
+#dailyncb{
+	color: red;
+	font-size: 17px;
+	font-weight: bold;
+}
+#daily-quote-text{
+	color: blue;
+	font-size: 14px;
 }

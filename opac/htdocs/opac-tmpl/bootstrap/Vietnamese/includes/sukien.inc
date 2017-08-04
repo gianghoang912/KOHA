@@ -1,4 +1,4 @@
-<div class="sk">
+<div class="sk col-xs-12">
 	[% FOREACH koha_new1 IN koha_news %]
 	<div class="preview-img">
 		<a href="/cgi-bin/koha/opac-ctnews.pl?idnew=[% koha_new1.idnew %]&idgroup=[% koha_new1.idgroup %]">

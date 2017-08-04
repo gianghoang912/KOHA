@@ -1,12 +1,15 @@
-<select class="lienketweb" style="width:100%;margin-top:20px; color:#333333;">
-	<option value="">---------- Liên kết Website ----------</option>
-	<option value="#">Link 01</option>
-	<option value="#">Link 02</option>
-	<option value="#">Link 03</option>
-	<option value="#">Link 04</option>
-	<option value="#">Link 05</option>
-	<option></option>
-</select>
+<div class="lienketweb col-xs-12">
+	<select style="width:100%;margin-top:20px; color:#333333;">
+		<option value="">--Liên kết Website --</option>
+		<option value="#">Link 01</option>
+		<option value="#">Link 02</option>
+		<option value="#">Link 03</option>
+		<option value="#">Link 04</option>
+		<option value="#">Link 05</option>
+		<option></option>
+	</select>
+</div>
+
 <script>
 	$(document).ready(function(){
 		$(".lienketweb").change(function(){
@@ -16,6 +19,6 @@
 		})
 	})
 </script>
-<div class="counter">
-	<p>0000999999</p>
+<div class="col-xs-12">
+	<div class="counter"><p>999999</p></div>
 </div>

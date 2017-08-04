@@ -2,7 +2,7 @@
 	<h3 class="title">Sự kiện</h3>
 	<div class="row">
 		[% FOREACH koha_new IN kohanew_thuan %]
-		<div class="col-xs-6 sk-ct">
+		<div class="sk-ct col-xs-12 col-sm-6">
 			<div class="imgcl">
 				<div class="img-sk">
 					<h2 class="month">[% koha_new.month %]
